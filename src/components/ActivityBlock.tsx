@@ -1,5 +1,8 @@
+// src/components/ActivityBlock.tsx - Visar en aktivitet i schemat
 import React from 'react';
 import type { Activity, FamilyMember } from '../types';
+import { IconRenderer } from './IconRenderer';
+import { getActivityColors, createStripedPattern } from '../utils/colorUtils';
 
 interface ActivityBlockProps {
   activity: Activity;
@@ -25,10 +28,25 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
     }
   };
 
+  // Determine background based on custom color or participant colors
+  const getBackgroundStyle = (): React.CSSProperties => {
+    if (activity.customColor) {
+      return { background: activity.customColor };
+    }
+    
+    const participantColors = getActivityColors(activity.participants, familyMembers);
+    return createStripedPattern(participantColors);
+  };
+
+  const backgroundStyle = getBackgroundStyle();
+
   return (
     <div
       className="activity-block"
-      style={style}
+      style={{
+        ...style,
+        ...backgroundStyle
+      }}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -36,7 +54,11 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
       onKeyDown={handleKeyDown}
     >
       <div className="activity-name">
-        <span>{activity.icon}</span>
+        <IconRenderer 
+          icon={activity.icon} 
+          iconType={activity.iconType || 'emoji'} 
+          size={16}
+        />
         {activity.name}
       </div>
       <div className="activity-time">
@@ -44,7 +66,12 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
       </div>
       <div className="activity-participants">
         {participants.map(p => (
-          <span key={p.id} aria-label={p.name}>{p.icon}</span>
+          <IconRenderer 
+            key={p.id}
+            icon={p.icon} 
+            iconType={p.iconType || 'emoji'} 
+            size={16}
+          />
         ))}
       </div>
     </div>

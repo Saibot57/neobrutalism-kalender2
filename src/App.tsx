@@ -34,10 +34,10 @@ import { useLocalStorage, useFocusTrap } from './hooks';
 import { Header } from './components/Header';
 import { FamilyBar } from './components/FamilyBar';
 import { WeekNavigation } from './components/WeekNavigation';
-import { WeekPicker } from './components/WeekPicker';
+import { WeekPicker } from './components/WeekPicker-v2';
 import { ScheduleGrid } from './components/ScheduleGrid';
-import { ActivityModal } from './components/ActivityModal';
-import { SettingsModal } from './components/SettingsModal';
+import { ActivityModal } from './components/ActivityModal-v2';
+import { SettingsModal } from './components/SettingsModal-v2';
 
 // Styles
 import './styles/neobrutalism.css';

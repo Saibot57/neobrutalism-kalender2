@@ -1,0 +1,227 @@
+/* src/styles/sizeable-modal.css - Stilar för SizeableModal (NY VERSION) */
+/* Sizeable Modal Specific Styles */
+.sizeable-modal {
+    position: relative;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Size control bar */
+  .modal-size-controls {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 0 20px;
+    z-index: 10;
+  }
+  
+  /* Size control buttons */
+  .size-control-btn {
+    background: var(--neo-white);
+    border: 3px solid var(--neo-black);
+    padding: 8px 16px;
+    font-family: 'Space Grotesk', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: .1s;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .size-control-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--neo-black);
+    background: var(--neo-yellow);
+  }
+  
+  .size-control-btn:active {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .size-control-btn.active {
+    background: var(--neo-cyan);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--neo-black);
+  }
+  
+  .size-control-btn .size-label {
+    display: none;
+  }
+  
+  /* Show labels on larger screens */
+  @media (min-width: 768px) {
+    .size-control-btn .size-label {
+      display: inline;
+    }
+  }
+  
+  /* Modal size animations */
+  .sizeable-modal.size-small {
+    animation: sizeToSmall 0.3s ease-out;
+  }
+  
+  .sizeable-modal.size-medium {
+    animation: sizeToMedium 0.3s ease-out;
+  }
+  
+  .sizeable-modal.size-large {
+    animation: sizeToLarge 0.3s ease-out;
+  }
+  
+  .sizeable-modal.size-fullscreen {
+    animation: sizeToFullscreen 0.3s ease-out;
+  }
+  
+  /* Subtle animations for size changes */
+  @keyframes sizeToSmall {
+    from { transform: scale(1.02); }
+    to { transform: scale(1); }
+  }
+  
+  @keyframes sizeToMedium {
+    from { transform: scale(1.01); }
+    to { transform: scale(1); }
+  }
+  
+  @keyframes sizeToLarge {
+    from { transform: scale(0.99); }
+    to { transform: scale(1); }
+  }
+  
+  @keyframes sizeToFullscreen {
+    from { transform: scale(0.98); }
+    to { transform: scale(1); }
+  }
+  
+  /* Alternative inline controls (inside modal header) */
+  .modal-header-with-size-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--neo-purple);
+    color: var(--neo-white);
+    border-bottom: 3px solid var(--neo-black);
+  }
+  
+  .modal-header-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .size-control-inline {
+    width: 36px;
+    height: 36px;
+    background: var(--neo-white);
+    color: var(--neo-black);
+    border: 2px solid var(--neo-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: .1s;
+  }
+  
+  .size-control-inline:hover {
+    background: var(--neo-yellow);
+    transform: scale(1.1);
+  }
+  
+  .size-control-inline.active {
+    background: var(--neo-cyan);
+  }
+  
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .modal-size-controls {
+      top: -45px;
+      gap: 5px;
+    }
+    
+    .size-control-btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+    }
+    
+    /* On mobile, force medium size */
+    .sizeable-modal.size-large,
+    .sizeable-modal.size-fullscreen {
+      width: 95vw !important;
+      height: 85vh !important;
+    }
+  }
+  
+  /* Dark mode support (if needed) */
+  @media (prefers-color-scheme: dark) {
+    .size-control-btn {
+      background: var(--neo-black);
+      color: var(--neo-white);
+      border-color: var(--neo-white);
+    }
+    
+    .size-control-btn.active {
+      background: var(--neo-purple);
+    }
+  }
+  
+  /* Smooth transitions between sizes */
+  .sizeable-modal {
+    will-change: width, height;
+  }
+  
+  /* Prevent content jump during resize */
+  .sizeable-modal .modal-body {
+    overflow-y: auto;
+    flex: 1;
+  }
+  
+  /* Week Picker Fixed Size */
+  .week-picker-fixed {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--neo-bg);
+    border: 3px solid var(--neo-black);
+    padding: 20px;
+    box-shadow: var(--shadow-xl);
+    z-index: 1001;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .week-picker-fixed .week-picker-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .week-picker-fixed .week-picker-grid {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    .week-picker-fixed {
+      width: 95vw;
+      height: 70vh;
+    }
+  }
