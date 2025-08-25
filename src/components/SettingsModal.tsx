@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
-import { X, Save, Maximize2 } from 'lucide-react';
+import { X, Save } from 'lucide-react';
 import type { Settings } from '../types';
-import { ResizableModal } from './ResizableModal';
+import { SizableModal } from './SizableModal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -17,30 +17,22 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
     };
 
     return (
-      <ResizableModal
+      <SizableModal
         isOpen={isOpen}
         onClose={onClose}
         storageKey="settings-modal"
-        minWidth={350}
-        minHeight={300}
-        defaultWidth={500}
-        defaultHeight={400}
+        initialSize="small"
         ref={ref}
       >
         <div className="modal-header">
           <h2 id="settings-title" className="modal-title">Inställningar</h2>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <div className="resize-hint" title="Dra i hörnen för att ändra storlek">
-              <Maximize2 size={20} />
-            </div>
-            <button
-              className="modal-close"
-              onClick={onClose}
-              aria-label="Stäng inställningar"
-            >
-              <X size={24}/>
-            </button>
-          </div>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Stäng inställningar"
+          >
+            <X size={24}/>
+          </button>
         </div>
 
         <div className="modal-body">
@@ -94,7 +86,7 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
             <Save size={20}/> Spara
           </button>
         </div>
-      </ResizableModal>
+      </SizableModal>
     );
   }
 );
