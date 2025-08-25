@@ -810,3 +810,52 @@ h1 {
 .resize-handle-se:hover {
   animation: none;
 }
+/* ... befintliga stilar ... */
+
+/* Icon Picker */
+.icon-picker-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  z-index: 1010;
+  background: var(--neo-white);
+  border: 3px solid var(--neo-black);
+  box-shadow: var(--shadow-lg);
+  padding: 15px;
+}
+
+.icon-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.icon-picker-header h4 {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* Anpassningar för emoji-picker-react */
+.EmojiPickerReact {
+  border: none !important;
+  box-shadow: none !important;
+  background: var(--neo-bg) !important;
+}
+
+.EmojiPickerReact .epr-search-container input {
+  font-family: 'Space Grotesk', monospace !important;
+  border: 2px solid var(--neo-black) !important;
+  background-color: var(--neo-white) !important;
+}
+
+.EmojiPickerReact .epr-category-nav button {
+  filter: grayscale(100%);
+  transition: .2s;
+}
+
+.EmojiPickerReact .epr-category-nav button:hover,
+.EmojiPickerReact .epr-category-nav button.epr-cat-btn-active {
+  filter: grayscale(0%);
+}
