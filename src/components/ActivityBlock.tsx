@@ -25,10 +25,42 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
     }
   };
 
+  const getBackgroundStyle = () => {
+    // 1. Egen färg har högst prioritet
+    if (activity.color) {
+      return { background: activity.color };
+    }
+
+    // 2. Inga deltagare, neutral färg
+    if (participants.length === 0) {
+        return { background: '#E0E0E0' }; 
+    }
+
+    // 3. En deltagare, använd dennes färg
+    if (participants.length === 1) {
+      return { background: participants[0].color };
+    }
+
+    // 4. Flera deltagare, skapa en diagonal gradient
+    const participantColors = participants.map(p => p.color);
+    const colorStops = participantColors.map((color, index) => {
+        const start = (100 / participantColors.length) * index;
+        const end = (100 / participantColors.length) * (index + 1);
+        return `${color} ${start}%, ${color} ${end}%`;
+    }).join(', ');
+
+    return { background: `linear-gradient(135deg, ${colorStops})` };
+  };
+
+  const backgroundStyle = getBackgroundStyle();
+
   return (
     <div
       className="activity-block"
-      style={style}
+      style={{
+        ...style,
+        ...backgroundStyle
+      }}
       onClick={onClick}
       role="button"
       tabIndex={0}

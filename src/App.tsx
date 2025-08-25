@@ -5,25 +5,24 @@ import { AlertCircle } from 'lucide-react';
 import type { Activity, FormData, Settings } from './types';
 
 // Constants
-import { 
-  DEFAULT_FAMILY_MEMBERS, 
-  ACTIVITY_COLORS, 
+import {
+  DEFAULT_FAMILY_MEMBERS,
   DEFAULT_SETTINGS,
   WEEKDAYS_FULL,
   WEEKEND_DAYS
 } from './constants';
 
 // Utils
-import { 
-  getWeekNumber, 
-  getWeekDateRange, 
-  isWeekInPast, 
-  isWeekInFuture 
+import {
+  getWeekNumber,
+  getWeekDateRange,
+  isWeekInPast,
+  isWeekInFuture
 } from './utils/dateUtils';
-import { 
-  generateTimeSlots, 
-  conflictsExist, 
-  generateActivityId 
+import {
+  generateTimeSlots,
+  conflictsExist,
+  generateActivityId
 } from './utils/scheduleUtils';
 import { downloadICS } from './utils/exportUtils';
 
@@ -52,7 +51,8 @@ const BLANK_FORM: FormData = {
   location: '',
   notes: '',
   recurring: false,
-  recurringEndDate: ''
+  recurringEndDate: '',
+  color: undefined
 };
 
 export default function App() {
@@ -92,7 +92,8 @@ export default function App() {
         recurring: false,
         recurringEndDate: '',
         location: editingActivity.location || '',
-        notes: editingActivity.notes || ''
+        notes: editingActivity.notes || '',
+        color: editingActivity.color
       });
     } else {
       setFormData(BLANK_FORM);
@@ -117,7 +118,7 @@ export default function App() {
   useFocusTrap(settingsModalRef, settingsOpen);
 
   // Derived data
-  const days = settings.showWeekends 
+  const days = settings.showWeekends
     ? [...WEEKDAYS_FULL, ...WEEKEND_DAYS]
     : WEEKDAYS_FULL;
   const timeSlots = generateTimeSlots(settings.dayStart, settings.dayEnd);
@@ -156,7 +157,8 @@ export default function App() {
         ...formData,
         day: formData.days[0],
         week: selectedWeek,
-        year: selectedYear
+        year: selectedYear,
+        color: formData.color
       }];
     } else {
       // Create new activities
@@ -187,7 +189,7 @@ export default function App() {
               endTime: formData.endTime,
               location: formData.location,
               notes: formData.notes,
-              color: ACTIVITY_COLORS[Math.floor(Math.random() * ACTIVITY_COLORS.length)]
+              color: formData.color
             });
           });
         });
@@ -205,7 +207,7 @@ export default function App() {
             endTime: formData.endTime,
             location: formData.location,
             notes: formData.notes,
-            color: ACTIVITY_COLORS[Math.floor(Math.random() * ACTIVITY_COLORS.length)]
+            color: formData.color
           });
         });
       }
@@ -222,7 +224,7 @@ export default function App() {
 
     // Save activities
     if (editingActivity) {
-      setActivities((prev: Activity[]) => prev.map((a: Activity) => 
+      setActivities((prev: Activity[]) => prev.map((a: Activity) =>
         a.id === editingActivity.id ? newActivities[0] : a
       ));
     } else {

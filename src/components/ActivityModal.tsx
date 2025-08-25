@@ -1,7 +1,8 @@
 import { forwardRef } from 'react';
-import { X, Save, Trash2, Repeat, Maximize2 } from 'lucide-react';
+import { X, Save, Trash2, Repeat } from 'lucide-react';
 import type { FormData, FamilyMember } from '../types';
-import { ResizableModal } from './ResizableModal';
+import { SizableModal } from './SizableModal';
+import { ACTIVITY_COLORS } from '../constants';
 
 interface ActivityModalProps {
   isOpen: boolean;
@@ -33,32 +34,24 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
     };
 
     return (
-      <ResizableModal
+      <SizableModal
         isOpen={isOpen}
         onClose={onClose}
         storageKey="activity-modal"
-        minWidth={400}
-        minHeight={400}
-        defaultWidth={600}
-        defaultHeight={600}
+        initialSize="medium"
         ref={ref}
       >
         <div className="modal-header">
           <h2 id="modal-title" className="modal-title">
             {isEditing ? 'Redigera Aktivitet' : 'Ny Aktivitet'}
           </h2>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <div className="resize-hint" title="Dra i hörnen för att ändra storlek">
-              <Maximize2 size={20} />
-            </div>
-            <button 
-              className="modal-close" 
-              onClick={onClose}
-              aria-label="Stäng modal"
-            >
-              <X size={24}/>
-            </button>
-          </div>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Stäng modal"
+          >
+            <X size={24}/>
+          </button>
         </div>
 
         <div className="modal-body">
@@ -66,21 +59,21 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           <div className="form-group">
             <label htmlFor="activity-icon" className="form-label">Aktivitetsnamn *</label>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
+              <input
                 id="activity-icon"
-                type="text" 
-                className="form-input" 
+                type="text"
+                className="form-input"
                 style={{ width: '60px', textAlign: 'center', fontSize: '1.5rem' }}
-                value={formData.icon} 
+                value={formData.icon}
                 onChange={e => onFormChange({ ...formData, icon: e.target.value })}
                 aria-label="Aktivitetsikon"
               />
-              <input 
+              <input
                 id="activity-name"
-                type="text" 
-                className="form-input" 
+                type="text"
+                className="form-input"
                 placeholder="T.ex. Fotboll"
-                value={formData.name} 
+                value={formData.name}
                 onChange={e => onFormChange({ ...formData, name: e.target.value })}
                 aria-label="Aktivitetsnamn"
                 aria-required="true"
@@ -91,14 +84,14 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           {/* Days */}
           <div className="form-group">
             <label className="form-label">Välj Dagar *</label>
-            <div 
-              className="day-selector" 
+            <div
+              className="day-selector"
               style={{ gridTemplateColumns: `repeat(${days.length <= 3 ? days.length : 3}, 1fr)` }}
               role="group"
               aria-label="Välj veckodagar"
             >
               {days.map(day => (
-                <div 
+                <div
                   key={day}
                   className={`day-checkbox ${formData.days.includes(day) ? 'selected' : ''} ${isEditing ? 'disabled' : ''}`}
                   onClick={() => handleDayToggle(day)}
@@ -123,7 +116,7 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
             <label className="form-label">Deltagare *</label>
             <div className="participants-grid" role="group" aria-label="Välj deltagare">
               {familyMembers.map(member => (
-                <div 
+                <div
                   key={member.id}
                   className={`participant-option ${formData.participants.includes(member.id) ? 'selected' : ''}`}
                   onClick={() => handleParticipantToggle(member.id)}
@@ -149,17 +142,17 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           <div className="form-group">
             <label className="form-label">Tid *</label>
             <div className="time-inputs">
-              <input 
-                type="time" 
-                className="form-input" 
+              <input
+                type="time"
+                className="form-input"
                 value={formData.startTime}
                 onChange={e => onFormChange({ ...formData, startTime: e.target.value })}
                 aria-label="Starttid"
                 aria-required="true"
               />
-              <input 
-                type="time" 
-                className="form-input" 
+              <input
+                type="time"
+                className="form-input"
                 value={formData.endTime}
                 onChange={e => onFormChange({ ...formData, endTime: e.target.value })}
                 aria-label="Sluttid"
@@ -171,12 +164,12 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           {/* Location */}
           <div className="form-group">
             <label htmlFor="activity-location" className="form-label">Plats</label>
-            <input 
+            <input
               id="activity-location"
-              type="text" 
-              className="form-input" 
+              type="text"
+              className="form-input"
               placeholder="T.ex. Sporthallen"
-              value={formData.location} 
+              value={formData.location}
               onChange={e => onFormChange({ ...formData, location: e.target.value })}
             />
           </div>
@@ -184,22 +177,71 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           {/* Notes */}
           <div className="form-group">
             <label htmlFor="activity-notes" className="form-label">Anteckningar</label>
-            <textarea 
+            <textarea
               id="activity-notes"
-              rows={3} 
+              rows={3}
               className="form-textarea"
               placeholder="Ytterligare information..."
-              value={formData.notes} 
+              value={formData.notes}
               onChange={e => onFormChange({ ...formData, notes: e.target.value })}
             />
+          </div>
+
+          {/* Color Picker */}
+          <div className="form-group">
+            <label htmlFor="activity-color" className="form-label">
+              Egen Färg (valfritt)
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input
+                id="activity-color"
+                type="color"
+                className="form-input"
+                style={{ padding: '0', height: '45px', width: '60px' }}
+                value={formData.color || '#ffffff'}
+                onChange={(e) =>
+                  onFormChange({ ...formData, color: e.target.value })
+                }
+                aria-label="Välj egen färg"
+              />
+              <input
+                 type="text"
+                 className="form-input"
+                 placeholder="T.ex. #FFD93D"
+                 value={formData.color || ''}
+                 onChange={(e) => onFormChange({ ...formData, color: e.target.value })}
+              />
+              <button
+                className="btn"
+                onClick={() => onFormChange({ ...formData, color: undefined })}
+                aria-label="Återställ till standardfärg"
+              >
+                Auto
+              </button>
+            </div>
+            <div style={{ display: 'flex', gap: '5px', marginTop: '10px', flexWrap: 'wrap' }}>
+                {ACTIVITY_COLORS.map(color => (
+                    <div
+                        key={color}
+                        style={{
+                            width: '30px',
+                            height: '30px',
+                            backgroundColor: color,
+                            border: '2px solid var(--neo-black)',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => onFormChange({ ...formData, color })}
+                    />
+                ))}
+            </div>
           </div>
 
           {/* Recurring */}
           {!isEditing && (
             <div className="form-group">
               <label className="checkbox-label">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   className="checkbox-input"
                   checked={formData.recurring}
                   onChange={e => onFormChange({ ...formData, recurring: e.target.checked })}
@@ -210,9 +252,9 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
               {formData.recurring && (
                 <div className="recurring-section">
                   <label htmlFor="recurring-end" className="form-label">Upprepa till och med</label>
-                  <input 
+                  <input
                     id="recurring-end"
-                    type="date" 
+                    type="date"
                     className="form-input"
                     value={formData.recurringEndDate}
                     onChange={e => onFormChange({ ...formData, recurringEndDate: e.target.value })}
@@ -226,8 +268,8 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
 
         <div className="modal-footer">
           {isEditing && (
-            <button 
-              className="btn btn-danger" 
+            <button
+              className="btn btn-danger"
               onClick={onDelete}
               aria-label="Ta bort aktivitet"
             >
@@ -236,8 +278,8 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
           )}
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '15px' }}>
             <button className="btn" onClick={onClose}>Avbryt</button>
-            <button 
-              className="btn btn-success" 
+            <button
+              className="btn btn-success"
               onClick={onSave}
               aria-label="Spara aktivitet"
             >
@@ -245,7 +287,7 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
             </button>
           </div>
         </div>
-      </ResizableModal>
+      </SizableModal>
     );
   }
 );

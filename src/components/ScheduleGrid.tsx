@@ -85,7 +85,6 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                         style={{
                           top,
                           height,
-                          background: activity.color,
                           left,
                           width,
                           right: 'auto'
