@@ -33,8 +33,8 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
             <div className="resize-hint" title="Dra i hörnen för att ändra storlek">
               <Maximize2 size={20} />
             </div>
-            <button 
-              className="modal-close" 
+            <button
+              className="modal-close"
               onClick={onClose}
               aria-label="Stäng inställningar"
             >
@@ -48,8 +48,8 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
           <div className="form-group">
             <label className="form-label">Arbetsdagar</label>
             <label className="checkbox-label">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 className="checkbox-input"
                 checked={settings.showWeekends}
                 onChange={e => onSettingsChange({ ...settings, showWeekends: e.target.checked })}
@@ -63,20 +63,20 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
           <div className="form-group">
             <label className="form-label">Tidsintervall (start–slut)</label>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 className="form-input"
-                value={settings.dayStart} 
-                min="0" 
+                value={settings.dayStart}
+                min="0"
                 max="23"
                 onChange={e => onSettingsChange({ ...settings, dayStart: Number(e.target.value) })}
                 aria-label="Starttimme"
               />
-              <input 
-                type="number" 
+              <input
+                type="number"
                 className="form-input"
-                value={settings.dayEnd} 
-                min={settings.dayStart + 1} 
+                value={settings.dayEnd}
+                min={settings.dayStart + 1}
                 max="23"
                 onChange={e => onSettingsChange({ ...settings, dayEnd: Number(e.target.value) })}
                 aria-label="Sluttimme"
@@ -86,8 +86,8 @@ export const SettingsModal = forwardRef<HTMLDivElement, SettingsModalProps>(
         </div>
 
         <div className="modal-footer">
-          <button 
-            className="btn btn-success" 
+          <button
+            className="btn btn-success"
             onClick={handleSave}
             aria-label="Spara inställningar"
           >
