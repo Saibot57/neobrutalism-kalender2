@@ -1,43 +1,29 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { useResizable } from '../hooks';
+import { useSizable, type ModalSize } from '../hooks/useSizable';
+import { Square, StretchHorizontal, StretchVertical } from 'lucide-react';
 
-interface ResizableModalProps {
+interface SizableModalProps {
   children: ReactNode;
   isOpen: boolean;
   onClose: () => void;
-  storageKey?: string;
-  minWidth?: number;
-  minHeight?: number;
-  maxWidth?: number;
-  maxHeight?: number;
-  defaultWidth?: number;
-  defaultHeight?: number;
+  storageKey: string;
+  initialSize?: ModalSize;
 }
 
-export const ResizableModal = forwardRef<HTMLDivElement, ResizableModalProps>(
-  ({ 
-    children, 
-    isOpen, 
-    onClose, 
+export const SizableModal = forwardRef<HTMLDivElement, SizableModalProps>(
+  ({
+    children,
+    isOpen,
+    onClose,
     storageKey,
-    minWidth = 400,
-    minHeight = 300,
-    maxWidth,
-    maxHeight,
-    defaultWidth = 600,
-    defaultHeight = 500
+    initialSize = 'medium'
   }, ref) => {
-    const modalRef = React.useRef<HTMLDivElement>(null);
-    const { handleMouseDown, isResizing } = useResizable(modalRef as React.RefObject<HTMLElement>, {
-      minWidth,
-      minHeight,
-      maxWidth: maxWidth || window.innerWidth * 0.9,
-      maxHeight: maxHeight || window.innerHeight * 0.9,
-      defaultWidth,
-      defaultHeight,
-      storageKey
-    });
+
+    const modalRef = useRef<HTMLDivElement>(null);
+    React.useImperativeHandle(ref, () => modalRef.current as HTMLDivElement);
+
+    const { currentSize, setSize } = useSizable(modalRef as React.RefObject<HTMLElement>, { storageKey, initialSize });
 
     if (!isOpen) return null;
 
@@ -45,70 +31,34 @@ export const ResizableModal = forwardRef<HTMLDivElement, ResizableModalProps>(
       if (e.target === e.currentTarget) onClose();
     };
 
+    const sizeButtons: { size: ModalSize; icon: ReactNode; label: string }[] = [
+        { size: 'small', icon: <Square size={18}/>, label: 'Liten' },
+        { size: 'medium', icon: <StretchHorizontal size={18}/>, label: 'Medium' },
+        { size: 'large', icon: <StretchVertical size={18}/>, label: 'Stor' },
+    ];
+
     return (
-      <div 
-        className={`modal-overlay ${isResizing ? 'resizing' : ''}`}
+      <div
+        className="modal-overlay"
         onClick={handleOverlayClick}
       >
-        <div 
-          className="modal resizable-modal" 
-          ref={(node) => {
-            // Handle both refs
-            modalRef.current = node;
-            if (ref) {
-              if (typeof ref === 'function') {
-                ref(node);
-              } else {
-                ref.current = node;
-              }
-            }
-          }}
+        <div
+          className="modal sizable-modal"
+          ref={modalRef}
         >
-          {/* Resize Handles */}
-          <div 
-            className="resize-handle resize-handle-n" 
-            onMouseDown={(e) => handleMouseDown(e, 'n')}
-            aria-label="Resize top"
-          />
-          <div 
-            className="resize-handle resize-handle-s" 
-            onMouseDown={(e) => handleMouseDown(e, 's')}
-            aria-label="Resize bottom"
-          />
-          <div 
-            className="resize-handle resize-handle-e" 
-            onMouseDown={(e) => handleMouseDown(e, 'e')}
-            aria-label="Resize right"
-          />
-          <div 
-            className="resize-handle resize-handle-w" 
-            onMouseDown={(e) => handleMouseDown(e, 'w')}
-            aria-label="Resize left"
-          />
-          <div 
-            className="resize-handle resize-handle-ne" 
-            onMouseDown={(e) => handleMouseDown(e, 'ne')}
-            aria-label="Resize top-right"
-          />
-          <div 
-            className="resize-handle resize-handle-nw" 
-            onMouseDown={(e) => handleMouseDown(e, 'nw')}
-            aria-label="Resize top-left"
-          />
-          <div 
-            className="resize-handle resize-handle-se" 
-            onMouseDown={(e) => handleMouseDown(e, 'se')}
-            aria-label="Resize bottom-right"
-          />
-          <div 
-            className="resize-handle resize-handle-sw" 
-            onMouseDown={(e) => handleMouseDown(e, 'sw')}
-            aria-label="Resize bottom-left"
-          />
-
-          {/* Resize Indicator */}
-          <div className="resize-indicator">
-            <span className="resize-dots">⋮⋮</span>
+          {/* Size Controls */}
+          <div className="modal-size-controls">
+            {sizeButtons.map(({ size, icon, label }) => (
+              <button
+                key={size}
+                className={`btn-size ${currentSize === size ? 'active' : ''}`}
+                onClick={() => setSize(size)}
+                aria-label={`Byt till ${label} storlek`}
+                title={label}
+              >
+                {icon}
+              </button>
+            ))}
           </div>
 
           {children}
@@ -118,4 +68,4 @@ export const ResizableModal = forwardRef<HTMLDivElement, ResizableModalProps>(
   }
 );
 
-ResizableModal.displayName = 'ResizableModal';
+SizableModal.displayName = 'SizableModal';

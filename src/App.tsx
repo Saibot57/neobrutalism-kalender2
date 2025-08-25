@@ -5,25 +5,24 @@ import { AlertCircle } from 'lucide-react';
 import type { Activity, FormData, Settings } from './types';
 
 // Constants
-import { 
-  DEFAULT_FAMILY_MEMBERS, 
-  ACTIVITY_COLORS, 
+import {
+  DEFAULT_FAMILY_MEMBERS,
   DEFAULT_SETTINGS,
   WEEKDAYS_FULL,
   WEEKEND_DAYS
 } from './constants';
 
 // Utils
-import { 
-  getWeekNumber, 
-  getWeekDateRange, 
-  isWeekInPast, 
-  isWeekInFuture 
+import {
+  getWeekNumber,
+  getWeekDateRange,
+  isWeekInPast,
+  isWeekInFuture
 } from './utils/dateUtils';
-import { 
-  generateTimeSlots, 
-  conflictsExist, 
-  generateActivityId 
+import {
+  generateTimeSlots,
+  conflictsExist,
+  generateActivityId
 } from './utils/scheduleUtils';
 import { downloadICS } from './utils/exportUtils';
 
@@ -52,37 +51,31 @@ const BLANK_FORM: FormData = {
   location: '',
   notes: '',
   recurring: false,
-  recurringEndDate: ''
+  recurringEndDate: '',
+  color: undefined
 };
 
 export default function App() {
-  // Refs for focus trap
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsModalRef = useRef<HTMLDivElement>(null);
 
-  // Persistent state
   const [activities, setActivities] = useLocalStorage<Activity[]>('familjens-schema-activities', []);
   const [settings, setSettings] = useLocalStorage<Settings>('familjens-schema-settings', DEFAULT_SETTINGS);
 
-  // Calendar navigation
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const currentWeek = getWeekNumber(new Date());
   const currentYear = new Date().getFullYear();
   const isCurrentWeek = selectedWeek === currentWeek && selectedYear === currentYear;
 
-  // UI state
   const [modalOpen, setModalOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [showWeekPicker, setShowWeekPicker] = useState(false);
   const [showConflict, setShowConflict] = useState(false);
   const [clipboardWeek, setClipboardWeek] = useState<{ week: number; year: number } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-  // Form state
   const [formData, setFormData] = useState<FormData>(BLANK_FORM);
 
-  // Initialize form data when modal opens
   useEffect(() => {
     if (!modalOpen) return;
     if (editingActivity) {
@@ -92,14 +85,14 @@ export default function App() {
         recurring: false,
         recurringEndDate: '',
         location: editingActivity.location || '',
-        notes: editingActivity.notes || ''
+        notes: editingActivity.notes || '',
+        color: editingActivity.color
       });
     } else {
       setFormData(BLANK_FORM);
     }
   }, [modalOpen, editingActivity]);
 
-  // ESC key handler
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -112,18 +105,15 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleEsc);
   }, [modalOpen, settingsOpen, showWeekPicker]);
 
-  // Focus traps
   useFocusTrap(modalRef, modalOpen);
   useFocusTrap(settingsModalRef, settingsOpen);
 
-  // Derived data
-  const days = settings.showWeekends 
+  const days = settings.showWeekends
     ? [...WEEKDAYS_FULL, ...WEEKEND_DAYS]
     : WEEKDAYS_FULL;
   const timeSlots = generateTimeSlots(settings.dayStart, settings.dayEnd);
   const weekDates = getWeekDateRange(selectedWeek, selectedYear, days.length);
 
-  // Navigation
   const navigateWeek = (direction: number) => {
     const monday = getWeekDateRange(selectedWeek, selectedYear, 1)[0];
     monday.setDate(monday.getDate() + direction * 7);
@@ -136,7 +126,6 @@ export default function App() {
     setSelectedYear(currentYear);
   };
 
-  // Activity management
   const handleSaveActivity = () => {
     if (!formData.name || formData.days.length === 0 || formData.participants.length === 0) {
       alert('Fyll i alla obligatoriska fält!');
@@ -150,16 +139,15 @@ export default function App() {
     let newActivities: Activity[] = [];
 
     if (editingActivity) {
-      // Update existing activity
       newActivities = [{
         ...editingActivity,
         ...formData,
         day: formData.days[0],
         week: selectedWeek,
-        year: selectedYear
+        year: selectedYear,
+        color: formData.color
       }];
     } else {
-      // Create new activities
       if (formData.recurring && formData.recurringEndDate) {
         const endDate = new Date(formData.recurringEndDate);
         const cursor = new Date(weekDates[0]);
@@ -187,7 +175,7 @@ export default function App() {
               endTime: formData.endTime,
               location: formData.location,
               notes: formData.notes,
-              color: ACTIVITY_COLORS[Math.floor(Math.random() * ACTIVITY_COLORS.length)]
+              color: formData.color
             });
           });
         });
@@ -205,28 +193,26 @@ export default function App() {
             endTime: formData.endTime,
             location: formData.location,
             notes: formData.notes,
-            color: ACTIVITY_COLORS[Math.floor(Math.random() * ACTIVITY_COLORS.length)]
+            color: formData.color
           });
         });
       }
     }
 
-    // Check for conflicts
     if (conflictsExist(newActivities, activities)) {
       setShowConflict(true);
-      setTimeout(() => setShowConflict(false), 5000);
+      setTimeout(() => setShowConflict(false), 3000);
       return;
     }
 
     setShowConflict(false);
 
-    // Save activities
     if (editingActivity) {
-      setActivities((prev: Activity[]) => prev.map((a: Activity) => 
+      setActivities(prev => prev.map(a =>
         a.id === editingActivity.id ? newActivities[0] : a
       ));
     } else {
-      setActivities((prev: Activity[]) => [...prev, ...newActivities]);
+      setActivities(prev => [...prev, ...newActivities]);
     }
 
     setModalOpen(false);
@@ -235,7 +221,7 @@ export default function App() {
 
   const handleDeleteActivity = () => {
     if (editingActivity) {
-      setActivities((prev: Activity[]) => prev.filter((a: Activity) => a.id !== editingActivity.id));
+      setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
       setModalOpen(false);
       setEditingActivity(null);
     }
@@ -246,17 +232,15 @@ export default function App() {
     setModalOpen(true);
   };
 
-  // Copy/Paste functionality
   const handleCopyWeek = () => {
     setClipboardWeek({ week: selectedWeek, year: selectedYear });
   };
 
   const handlePasteWeek = () => {
     if (!clipboardWeek) return;
-
     const copiedActivities = activities
-      .filter((a: Activity) => a.week === clipboardWeek.week && a.year === clipboardWeek.year)
-      .map((a: Activity) => ({
+      .filter(a => a.week === clipboardWeek.week && a.year === clipboardWeek.year)
+      .map(a => ({
         ...a,
         id: generateActivityId(),
         week: selectedWeek,
@@ -265,12 +249,11 @@ export default function App() {
 
     if (conflictsExist(copiedActivities, activities)) {
       setShowConflict(true);
-      setTimeout(() => setShowConflict(false), 5000);
+      setTimeout(() => setShowConflict(false), 3000);
       return;
     }
-
     setShowConflict(false);
-    setActivities((prev: Activity[]) => [...prev, ...copiedActivities]);
+    setActivities(prev => [...prev, ...copiedActivities]);
     setClipboardWeek(null);
   };
 
@@ -291,9 +274,7 @@ export default function App() {
           }}
           onOpenSettings={() => setSettingsOpen(true)}
         />
-
         <FamilyBar members={DEFAULT_FAMILY_MEMBERS} />
-
         <WeekNavigation
           isCurrentWeek={isCurrentWeek}
           clipboardWeek={clipboardWeek}
@@ -306,7 +287,6 @@ export default function App() {
           onPasteWeek={handlePasteWeek}
           onExportWeek={handleExportWeek}
         />
-
         {showWeekPicker && (
           <WeekPicker
             selectedWeek={selectedWeek}
@@ -316,8 +296,6 @@ export default function App() {
             onClose={() => setShowWeekPicker(false)}
           />
         )}
-
-        {/* Notices */}
         {!isCurrentWeek && (
           <div className="notice-banner" role="alert">
             <AlertCircle size={24}/>
@@ -329,7 +307,6 @@ export default function App() {
             <AlertCircle size={24}/> Tidskonflikt! En deltagare är redan upptagen.
           </div>
         )}
-
         <ScheduleGrid
           days={days}
           weekDates={weekDates}
@@ -341,7 +318,6 @@ export default function App() {
           selectedYear={selectedYear}
           onActivityClick={handleActivityClick}
         />
-
         <ActivityModal
           ref={modalRef}
           isOpen={modalOpen}
@@ -354,7 +330,6 @@ export default function App() {
           onDelete={handleDeleteActivity}
           onFormChange={setFormData}
         />
-
         <SettingsModal
           ref={settingsModalRef}
           isOpen={settingsOpen}

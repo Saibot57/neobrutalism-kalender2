@@ -33,12 +33,12 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
-  const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 
+  const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun',
                      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
   return (
     <main className="schedule-container" role="main" aria-label="Veckans schema">
-      <div 
+      <div
         className="schedule-grid"
         style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
       >
@@ -85,7 +85,6 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                         style={{
                           top,
                           height,
-                          background: activity.color,
                           left,
                           width,
                           right: 'auto'
