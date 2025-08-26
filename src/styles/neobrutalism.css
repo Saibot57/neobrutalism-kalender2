@@ -734,7 +734,7 @@ h1 {
     margin-top: 20px;
   }
 }
-/* Add these styles to the end of src/styles/neobrutalism.css */
+/* Replace the previous .hover-card styles with these */
 
 .activity-block-wrapper {
   position: relative;
@@ -742,9 +742,8 @@ h1 {
 
 .hover-card {
   position: absolute;
-  top: 50%;
-  left: calc(100% + 10px);
-  transform: translateY(-50%);
+  bottom: calc(100% + 10px); /* Position above the element with a 10px gap */
+  right: 10px; /* Align to the right, slightly inset */
   width: 280px;
   background: var(--neo-white);
   border: 3px solid var(--neo-black);
