@@ -1,8 +1,9 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { X, Save, Trash2, Repeat } from 'lucide-react';
 import type { FormData, FamilyMember } from '../types';
 import { SizableModal } from './SizableModal';
 import { ACTIVITY_COLORS } from '../constants';
+import { IconPicker } from './IconPicker';
 
 interface ActivityModalProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ interface ActivityModalProps {
 
 export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
   ({ isOpen, isEditing, formData, familyMembers, days, onClose, onSave, onDelete, onFormChange }, ref) => {
+    const [showIconPicker, setShowIconPicker] = useState(false);
+
     const handleDayToggle = (day: string) => {
       if (isEditing) return;
       const newDays = formData.days.includes(day)
@@ -57,17 +60,16 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
         <div className="modal-body">
           {/* Name & Icon */}
           <div className="form-group">
-            <label htmlFor="activity-icon" className="form-label">Aktivitetsnamn *</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <input
-                id="activity-icon"
-                type="text"
-                className="form-input"
-                style={{ width: '60px', textAlign: 'center', fontSize: '1.5rem' }}
-                value={formData.icon}
-                onChange={e => onFormChange({ ...formData, icon: e.target.value })}
-                aria-label="Aktivitetsikon"
-              />
+            <label htmlFor="activity-name" className="form-label">Aktivitetsnamn *</label>
+            <div style={{ display: 'flex', gap: '10px', position: 'relative' }}>
+              <button
+                className="btn-icon"
+                onClick={() => setShowIconPicker(!showIconPicker)}
+                aria-label="Välj ikon"
+                style={{ fontSize: '1.5rem', width: '60px', height: 'auto' }}
+              >
+                {formData.icon}
+              </button>
               <input
                 id="activity-name"
                 type="text"
@@ -78,6 +80,12 @@ export const ActivityModal = forwardRef<HTMLDivElement, ActivityModalProps>(
                 aria-label="Aktivitetsnamn"
                 aria-required="true"
               />
+              {showIconPicker && (
+                <IconPicker
+                  onSelect={(icon) => onFormChange({ ...formData, icon })}
+                  onClose={() => setShowIconPicker(false)}
+                />
+              )}
             </div>
           </div>
 

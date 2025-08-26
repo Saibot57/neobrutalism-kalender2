@@ -32,7 +32,6 @@ export const useSizable = (
 
   useEffect(() => {
     applySize();
-    // Re-apply size on window resize to handle viewport changes
     window.addEventListener('resize', applySize);
     return () => window.removeEventListener('resize', applySize);
   }, [size, applySize]);

@@ -448,13 +448,11 @@ h1 {
   transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
 }
 
-/* Sizable Modal */
 .sizable-modal {
   max-width: 95vw;
   max-height: 95vh;
 }
 
-/* Modal Size Controls */
 .modal-size-controls {
   position: absolute;
   top: -25px;
@@ -664,6 +662,53 @@ h1 {
   width: 20px;
   height: 20px;
   cursor: pointer;
+}
+
+/* Icon Picker */
+.icon-picker-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  z-index: 1010;
+  background: var(--neo-white);
+  border: 3px solid var(--neo-black);
+  box-shadow: var(--shadow-lg);
+  padding: 15px;
+}
+
+.icon-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.icon-picker-header h4 {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.EmojiPickerReact {
+  border: none !important;
+  box-shadow: none !important;
+  background: var(--neo-bg) !important;
+}
+
+.EmojiPickerReact .epr-search-container input {
+  font-family: 'Space Grotesk', monospace !important;
+  border: 2px solid var(--neo-black) !important;
+  background-color: var(--neo-white) !important;
+}
+
+.EmojiPickerReact .epr-category-nav button {
+  filter: grayscale(100%);
+  transition: .2s;
+}
+
+.EmojiPickerReact .epr-category-nav button:hover,
+.EmojiPickerReact .epr-category-nav button.epr-cat-btn-active {
+  filter: grayscale(0%);
 }
 
 /* Responsive */
