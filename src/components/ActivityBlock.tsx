@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Activity, FamilyMember } from '../types';
+import { HoverCard } from './HoverCard';
 
 interface ActivityBlockProps {
   activity: Activity;
@@ -49,29 +50,37 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
 
   return (
     <div
-      className="activity-block"
-      style={{
-        ...style,
-        ...backgroundStyle
-      }}
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      aria-label={`${activity.name} från ${activity.startTime} till ${activity.endTime}`}
-      onKeyDown={handleKeyDown}
+      className="activity-block-wrapper"
+      style={style}
     >
-      <div className="activity-name">
-        <span>{activity.icon}</span>
-        {activity.name}
+      <div
+        className="activity-block"
+        style={{
+          ...backgroundStyle,
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+        }}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        aria-label={`${activity.name} från ${activity.startTime} till ${activity.endTime}`}
+        onKeyDown={handleKeyDown}
+      >
+        <div className="activity-name">
+          <span>{activity.icon}</span>
+          {activity.name}
+        </div>
+        <div className="activity-time">
+          {activity.startTime} – {activity.endTime}
+        </div>
+        <div className="activity-participants">
+          {participants.map(p => (
+            <span key={p.id} aria-label={p.name}>{p.icon}</span>
+          ))}
+        </div>
       </div>
-      <div className="activity-time">
-        {activity.startTime} – {activity.endTime}
-      </div>
-      <div className="activity-participants">
-        {participants.map(p => (
-          <span key={p.id} aria-label={p.name}>{p.icon}</span>
-        ))}
-      </div>
+      <HoverCard activity={activity} familyMembers={familyMembers} />
     </div>
   );
 };

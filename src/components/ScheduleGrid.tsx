@@ -83,11 +83,11 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                         activity={activity}
                         familyMembers={familyMembers}
                         style={{
+                          position: 'absolute',
                           top,
                           height,
                           left,
                           width,
-                          right: 'auto'
                         }}
                         onClick={() => onActivityClick(activity)}
                       />
