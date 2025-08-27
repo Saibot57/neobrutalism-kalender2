@@ -424,33 +424,27 @@ h1 {
 }
 
 /* Styles for smaller activity blocks */
-.activity-block.activity-block-small {
-  font-size: .75rem; /* Make font smaller */
-  padding: 4px;      /* Reduce padding to create more space */
-  gap: 2px;          /* Reduce gap between items */
+.activity-block.activity-block-compact {
+  font-size: .8rem;
+  padding: 5px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
 }
 
-.activity-block.activity-block-small .activity-participants {
-  display: none; /* Hide participants first */
-}
-
-.activity-block.activity-block-very-small {
-  font-size: .7rem; /* Make font even smaller */
-  justify-content: center; /* Center content vertically */
-}
-
-.activity-block.activity-block-very-small .activity-time,
-.activity-block.activity-block-very-small .activity-name span { /* Hide time AND icon */
+.activity-block.activity-block-compact .activity-participants,
+.activity-block.activity-block-compact .activity-name span { /* Hide participants and icon */
   display: none;
 }
 
-.activity-block.activity-block-very-small .activity-name {
-  justify-content: center; /* Center name horizontally */
-  text-align: center;
-  white-space: normal;     /* Allow name to wrap */
+.activity-block.activity-block-compact .activity-name {
+  justify-content: center;
+  white-space: normal;
   overflow: visible;
   text-overflow: clip;
 }
+
 
 /* Modal */
 .modal-overlay {
