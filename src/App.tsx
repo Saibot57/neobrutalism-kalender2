@@ -153,7 +153,7 @@ export default function App() {
       }];
     } else {
       if (formData.recurring && formData.recurringEndDate) {
-        const seriesId = generateActivityId(); // UPPDATERAD: Skapa ett ID för hela serien
+        const seriesId = generateActivityId(); 
         const endDate = new Date(formData.recurringEndDate);
         const cursor = new Date(weekDates[0]);
         const weeks: { week: number; year: number }[] = [];
@@ -170,7 +170,7 @@ export default function App() {
           formData.days.forEach(day => {
             newActivities.push({
               id: generateActivityId(),
-              seriesId: seriesId, // UPPDATERAD: Sätt serie-ID för varje händelse
+              seriesId: seriesId, 
               name: formData.name,
               icon: formData.icon,
               day,
@@ -225,29 +225,22 @@ export default function App() {
     setEditingActivity(null);
   };
 
-  // #region UPPDATERAD RADERINGSFUNKTION
   const handleDeleteActivity = () => {
     if (!editingActivity) return;
   
-    // Kontrollera om aktiviteten är en del av en serie
     if (editingActivity.seriesId) {
-      // Använd en bekräftelsedialog för att fråga användaren
       if (window.confirm("Vill du ta bort alla kommande händelser i den här serien? \n\nTryck på 'OK' för att ta bort hela serien, eller 'Avbryt' för att bara ta bort denna enskilda händelse.")) {
-        // Ta bort hela serien
         setActivities(prev => prev.filter(a => a.seriesId !== editingActivity.seriesId));
       } else {
-        // Ta bort endast denna händelse
         setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
       }
     } else {
-      // Om det inte är en serie, radera som vanligt
       setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
     }
   
     setModalOpen(false);
     setEditingActivity(null);
   };
-  // #endregion
 
   const handleActivityClick = (activity: Activity) => {
     setEditingActivity(activity);
@@ -295,33 +288,35 @@ export default function App() {
 
       importedData.forEach(item => {
         if (item.startDate && item.recurringEndDate && item.day) {
-          // Recurring event
+          const seriesId = generateActivityId(); // UPPDATERAD: Skapa ett ID för hela serien
           const startDate = new Date(item.startDate);
           const endDate = new Date(item.recurringEndDate);
           const dayOfWeek = ALL_DAYS.indexOf(item.day);
           if (dayOfWeek === -1) return;
           let cursor = new Date(startDate);
-          while (cursor <= endDate) {
-            if ((cursor.getDay() + 6) % 7 === dayOfWeek) {
-              newActivities.push({
-                id: generateActivityId(),
-                name: item.name || 'Unnamed Event',
-                icon: item.icon || '📅',
-                day: item.day,
-                week: getWeekNumber(cursor),
-                year: cursor.getFullYear(),
-                participants: item.participants || [],
-                startTime: item.startTime || '00:00',
-                endTime: item.endTime || '01:00',
-                location: item.location,
-                notes: item.notes,
-                color: item.color
-              });
-            }
+          while ((cursor.getDay() + 6) % 7 !== dayOfWeek) {
             cursor.setDate(cursor.getDate() + 1);
           }
+
+          while (cursor <= endDate) {
+            newActivities.push({
+              id: generateActivityId(),
+              seriesId: seriesId, // UPPDATERAD: Sätt serie-ID för varje händelse
+              name: item.name || 'Unnamed Event',
+              icon: item.icon || '📅',
+              day: item.day,
+              week: getWeekNumber(cursor),
+              year: cursor.getFullYear(),
+              participants: item.participants || [],
+              startTime: item.startTime || '00:00',
+              endTime: item.endTime || '01:00',
+              location: item.location,
+              notes: item.notes,
+              color: item.color
+            });
+            cursor.setDate(cursor.getDate() + 7);
+          }
         } else if (item.date) {
-          // Single event
           const activityDate = new Date(item.date);
           const dayOfWeek = (activityDate.getDay() + 6) % 7;
           const dayName = ALL_DAYS[dayOfWeek];
@@ -350,10 +345,10 @@ export default function App() {
 
       setActivities(prev => [...prev, ...newActivities]);
       alert(`${newActivities.length} activities imported successfully!`);
-      setDataModalOpen(false); // Close modal on success
-    } catch (error) {
-      console.error("Error importing activities:", error);
-      alert("Failed to import activities. Please check the data format.");
+      setDataModalOpen(false); 
+    } catch (error: any) {
+        console.error("Error importing activities:", error);
+        alert(`Failed to import activities. Please check the data format.\n\nError: ${error.message}`);
     }
   };
 
