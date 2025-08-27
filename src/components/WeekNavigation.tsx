@@ -12,6 +12,7 @@ interface WeekNavigationProps {
   onCopyWeek: () => void;
   onPasteWeek: () => void;
   onExportWeek: () => void;
+  onImportActivities: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const WeekNavigation: React.FC<WeekNavigationProps> = ({
@@ -24,17 +25,18 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
   onToggleWeekPicker,
   onCopyWeek,
   onPasteWeek,
-  onExportWeek
+  onExportWeek,
+  onImportActivities
 }) => {
-  const canPaste = clipboardWeek && 
+  const canPaste = clipboardWeek &&
     (clipboardWeek.week !== selectedWeek || clipboardWeek.year !== selectedYear);
 
   return (
     <nav className="week-nav" aria-label="Veckonavigering">
       <div className="week-nav-content">
         <div className="btn-group">
-          <button 
-            className="btn btn-icon" 
+          <button
+            className="btn btn-icon"
             onClick={() => onNavigateWeek(-1)}
             aria-label="Föregående vecka"
           >
@@ -48,15 +50,15 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
           >
             <Home size={20}/> Denna Vecka
           </button>
-          <button 
-            className="btn btn-icon" 
+          <button
+            className="btn btn-icon"
             onClick={() => onNavigateWeek(1)}
             aria-label="Nästa vecka"
           >
             <ChevronRight size={24}/>
           </button>
-          <button 
-            className="btn btn-info" 
+          <button
+            className="btn btn-info"
             onClick={onToggleWeekPicker}
             aria-label="Öppna veckoväljare"
           >
@@ -65,24 +67,33 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
         </div>
 
         <div className="btn-group">
-          <button 
-            className="btn btn-info" 
+          <button
+            className="btn btn-info"
             onClick={onCopyWeek}
             aria-label="Kopiera denna vecka"
           >
             <Copy size={20}/> Kopiera
           </button>
           {canPaste && (
-            <button 
-              className="btn btn-success" 
+            <button
+              className="btn btn-success"
               onClick={onPasteWeek}
               aria-label="Klistra in kopierad vecka"
             >
               <Upload size={20}/> Klistra in
             </button>
           )}
-          <button 
-            className="btn btn-success" 
+           <label className="btn btn-warning">
+            <Upload size={20} /> Importera
+            <input
+              type="file"
+              accept=".json"
+              style={{ display: 'none' }}
+              onChange={onImportActivities}
+            />
+          </label>
+          <button
+            className="btn btn-success"
             onClick={onExportWeek}
             aria-label="Exportera vecka som ICS"
           >

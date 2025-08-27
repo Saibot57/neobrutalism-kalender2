@@ -9,7 +9,8 @@ import {
   DEFAULT_FAMILY_MEMBERS,
   DEFAULT_SETTINGS,
   WEEKDAYS_FULL,
-  WEEKEND_DAYS
+  WEEKEND_DAYS,
+  ALL_DAYS
 } from './constants';
 
 // Utils
@@ -261,6 +262,98 @@ export default function App() {
     downloadICS(activities, selectedWeek, selectedYear, weekDates, days);
   };
 
+  const handleImportActivities = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text !== 'string') {
+          throw new Error("File content is not a string");
+        }
+
+        const importedData = JSON.parse(text) as Array<Partial<Activity> & { date?: string; startDate?: string; recurringEndDate?: string; day?: string }>;
+
+        if (!Array.isArray(importedData)) {
+          throw new Error("Invalid JSON format: must be an array.");
+        }
+
+        const newActivities: Activity[] = [];
+
+        importedData.forEach(item => {
+          if (item.startDate && item.recurringEndDate && item.day) {
+            // Recurring event
+            const startDate = new Date(item.startDate);
+            const endDate = new Date(item.recurringEndDate);
+            const dayOfWeek = ALL_DAYS.indexOf(item.day);
+
+            if (dayOfWeek === -1) return;
+
+            let cursor = new Date(startDate);
+
+            while (cursor <= endDate) {
+              if ((cursor.getDay() + 6) % 7 === dayOfWeek) {
+                newActivities.push({
+                  id: generateActivityId(),
+                  name: item.name || 'Unnamed Event',
+                  icon: item.icon || '📅',
+                  day: item.day,
+                  week: getWeekNumber(cursor),
+                  year: cursor.getFullYear(),
+                  participants: item.participants || [],
+                  startTime: item.startTime || '00:00',
+                  endTime: item.endTime || '01:00',
+                  location: item.location,
+                  notes: item.notes,
+                  color: item.color
+                });
+              }
+              cursor.setDate(cursor.getDate() + 1);
+            }
+          } else if (item.date) {
+            // Single event
+            const activityDate = new Date(item.date);
+            const dayOfWeek = (activityDate.getDay() + 6) % 7; // Monday = 0
+            const dayName = ALL_DAYS[dayOfWeek];
+
+            newActivities.push({
+              id: item.id || generateActivityId(),
+              name: item.name || 'Unnamed Event',
+              icon: item.icon || '📅',
+              day: dayName,
+              week: getWeekNumber(activityDate),
+              year: activityDate.getFullYear(),
+              participants: item.participants || [],
+              startTime: item.startTime || '00:00',
+              endTime: item.endTime || '01:00',
+              location: item.location,
+              notes: item.notes,
+              color: item.color
+            });
+          }
+        });
+
+        if (conflictsExist(newActivities, activities)) {
+          setShowConflict(true);
+          setTimeout(() => setShowConflict(false), 3000);
+          return;
+        }
+
+        setActivities(prev => [...prev, ...newActivities]);
+        alert(`${newActivities.length} activities imported successfully!`);
+
+      } catch (error) {
+        console.error("Error importing activities:", error);
+        alert("Failed to import activities. Please check the file format.");
+      }
+    };
+    reader.readAsText(file);
+
+    event.target.value = '';
+  };
+
   return (
     <div className="app-container">
       <div className="content-wrapper">
@@ -286,6 +379,7 @@ export default function App() {
           onCopyWeek={handleCopyWeek}
           onPasteWeek={handlePasteWeek}
           onExportWeek={handleExportWeek}
+          onImportActivities={handleImportActivities}
         />
         {showWeekPicker && (
           <WeekPicker

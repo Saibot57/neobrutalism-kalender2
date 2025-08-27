@@ -7,13 +7,15 @@ interface ActivityBlockProps {
   familyMembers: FamilyMember[];
   style: React.CSSProperties;
   onClick: () => void;
+  day: string;
 }
 
 export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   activity,
   familyMembers,
   style,
-  onClick
+  onClick,
+  day
 }) => {
   const participants = activity.participants
     .map(id => familyMembers.find(m => m.id === id))
@@ -47,10 +49,11 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   };
 
   const backgroundStyle = getBackgroundStyle();
+  const wrapperClassName = `activity-block-wrapper ${day === 'Måndag' ? 'hover-on-right' : ''}`;
 
   return (
     <div
-      className="activity-block-wrapper"
+      className={wrapperClassName}
       style={style}
     >
       <div

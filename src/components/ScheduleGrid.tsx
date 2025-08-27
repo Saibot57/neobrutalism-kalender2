@@ -77,20 +77,24 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                     const width = numColumns > 1 ? `${100 / numColumns}%` : 'calc(100% - 8px)';
                     const left = numColumns > 1 ? `${(100 / numColumns) * groupIndex}%` : '4px';
 
+                    // Define props in an object before passing them
+                    const activityBlockProps = {
+                      activity: activity,
+                      day: day,
+                      familyMembers: familyMembers,
+                      style: {
+                        position: 'absolute' as const,
+                        top,
+                        height,
+                        left,
+                        width,
+                      },
+                      onClick: () => onActivityClick(activity)
+                    };
+                    
+                    // Spread the props into the component
                     return (
-                      <ActivityBlock
-                        key={activity.id}
-                        activity={activity}
-                        familyMembers={familyMembers}
-                        style={{
-                          position: 'absolute',
-                          top,
-                          height,
-                          left,
-                          width,
-                        }}
-                        onClick={() => onActivityClick(activity)}
-                      />
+                      <ActivityBlock key={activity.id} {...activityBlockProps} />
                     );
                   })
                 )}
