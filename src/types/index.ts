@@ -7,6 +7,7 @@ export interface FamilyMember {
 
 export interface Activity {
   id: string;
+  seriesId?: string; // TILLAGD: För att identifiera händelser i samma serie
   name: string;
   icon: string;
   day: string;

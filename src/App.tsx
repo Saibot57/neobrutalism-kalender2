@@ -153,6 +153,7 @@ export default function App() {
       }];
     } else {
       if (formData.recurring && formData.recurringEndDate) {
+        const seriesId = generateActivityId(); // UPPDATERAD: Skapa ett ID för hela serien
         const endDate = new Date(formData.recurringEndDate);
         const cursor = new Date(weekDates[0]);
         const weeks: { week: number; year: number }[] = [];
@@ -169,6 +170,7 @@ export default function App() {
           formData.days.forEach(day => {
             newActivities.push({
               id: generateActivityId(),
+              seriesId: seriesId, // UPPDATERAD: Sätt serie-ID för varje händelse
               name: formData.name,
               icon: formData.icon,
               day,
@@ -223,13 +225,29 @@ export default function App() {
     setEditingActivity(null);
   };
 
+  // #region UPPDATERAD RADERINGSFUNKTION
   const handleDeleteActivity = () => {
-    if (editingActivity) {
+    if (!editingActivity) return;
+  
+    // Kontrollera om aktiviteten är en del av en serie
+    if (editingActivity.seriesId) {
+      // Använd en bekräftelsedialog för att fråga användaren
+      if (window.confirm("Vill du ta bort alla kommande händelser i den här serien? \n\nTryck på 'OK' för att ta bort hela serien, eller 'Avbryt' för att bara ta bort denna enskilda händelse.")) {
+        // Ta bort hela serien
+        setActivities(prev => prev.filter(a => a.seriesId !== editingActivity.seriesId));
+      } else {
+        // Ta bort endast denna händelse
+        setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
+      }
+    } else {
+      // Om det inte är en serie, radera som vanligt
       setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
-      setModalOpen(false);
-      setEditingActivity(null);
     }
+  
+    setModalOpen(false);
+    setEditingActivity(null);
   };
+  // #endregion
 
   const handleActivityClick = (activity: Activity) => {
     setEditingActivity(activity);
