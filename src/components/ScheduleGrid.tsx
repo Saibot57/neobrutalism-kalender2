@@ -36,11 +36,20 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
   const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun',
                      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
+  const columnWidths = days.map(day => {
+    const dayActivities = getActivitiesForDay(day);
+    const overlapGroups = calculateOverlapGroups(dayActivities);
+    // Om det finns 2 eller fler grupper (dvs. en krock), gör kolumnen 50% bredare.
+    return overlapGroups.length > 1 ? '1.5fr' : '1fr';
+  });
+
+  const gridTemplateColumns = `80px ${columnWidths.join(' ')}`;
+
   return (
     <main className="schedule-container" role="main" aria-label="Veckans schema">
       <div
         className="schedule-grid"
-        style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
+        style={{ gridTemplateColumns: gridTemplateColumns }}
       >
         {/* Time column */}
         <div className="time-column">
