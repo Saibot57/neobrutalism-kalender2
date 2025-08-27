@@ -305,7 +305,7 @@ h1 {
 
 .schedule-grid {
   display: grid;
-  min-width: 800px;
+  min-width: 1200px;
 }
 
 .time-column {
