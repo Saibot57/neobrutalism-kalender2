@@ -12,7 +12,7 @@ interface WeekNavigationProps {
   onCopyWeek: () => void;
   onPasteWeek: () => void;
   onExportWeek: () => void;
-  onImportActivities: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onOpenDataModal: () => void;
 }
 
 export const WeekNavigation: React.FC<WeekNavigationProps> = ({
@@ -26,7 +26,7 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
   onCopyWeek,
   onPasteWeek,
   onExportWeek,
-  onImportActivities
+  onOpenDataModal
 }) => {
   const canPaste = clipboardWeek &&
     (clipboardWeek.week !== selectedWeek || clipboardWeek.year !== selectedYear);
@@ -83,15 +83,12 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
               <Upload size={20}/> Klistra in
             </button>
           )}
-           <label className="btn btn-warning">
+           <button
+            className="btn btn-warning"
+            onClick={onOpenDataModal}
+           >
             <Upload size={20} /> Importera
-            <input
-              type="file"
-              accept=".json"
-              style={{ display: 'none' }}
-              onChange={onImportActivities}
-            />
-          </label>
+          </button>
           <button
             className="btn btn-success"
             onClick={onExportWeek}

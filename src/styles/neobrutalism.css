@@ -891,3 +891,33 @@ h1 {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+/* Data Modal Tabs */
+.data-modal-tabs {
+  display: flex;
+  border-bottom: 3px solid var(--neo-black);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 15px;
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: var(--neo-bg);
+  border: none;
+  border-right: 3px solid var(--neo-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tab-btn:last-child {
+  border-right: none;
+}
+
+.tab-btn.active {
+  background: var(--neo-yellow);
+}
