@@ -53,10 +53,10 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   
   const height = typeof style.height === 'number' ? style.height : 0;
   const activityBlockClasses = ['activity-block'];
-  if (height < 45) {
+  if (height < 46) { // Catches 45 min activities and less
     activityBlockClasses.push('activity-block-small');
   }
-  if (height < 30) {
+  if (height < 31) { // Catches 30 min activities and less
     activityBlockClasses.push('activity-block-very-small');
   }
 
