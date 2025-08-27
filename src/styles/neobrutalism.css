@@ -423,6 +423,23 @@ h1 {
   flex-wrap: wrap;
 }
 
+/* Styles for smaller activity blocks */
+.activity-block.activity-block-small {
+  font-size: .75rem;
+}
+
+.activity-block.activity-block-small .activity-participants {
+  display: none;
+}
+
+.activity-block.activity-block-very-small {
+  font-size: .65rem;
+}
+
+.activity-block.activity-block-very-small .activity-time {
+  display: none;
+}
+
 /* Modal */
 .modal-overlay {
   position: fixed;

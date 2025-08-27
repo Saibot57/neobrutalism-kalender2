@@ -50,6 +50,15 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
 
   const backgroundStyle = getBackgroundStyle();
   const wrapperClassName = `activity-block-wrapper ${day === 'Måndag' ? 'hover-on-right' : ''}`;
+  
+  const height = typeof style.height === 'number' ? style.height : 0;
+  const activityBlockClasses = ['activity-block'];
+  if (height < 45) {
+    activityBlockClasses.push('activity-block-small');
+  }
+  if (height < 30) {
+    activityBlockClasses.push('activity-block-very-small');
+  }
 
   return (
     <div
@@ -57,7 +66,7 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
       style={style}
     >
       <div
-        className="activity-block"
+        className={activityBlockClasses.join(' ')}
         style={{
           ...backgroundStyle,
           position: 'relative',
