@@ -445,6 +445,16 @@ h1 {
   text-overflow: clip;
 }
 
+.activity-block.activity-block-extra-compact {
+  gap: 0;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.activity-block.activity-block-extra-compact .activity-name,
+.activity-block.activity-block-extra-compact .activity-time {
+    line-height: 1.1;
+}
 
 /* Modal */
 .modal-overlay {

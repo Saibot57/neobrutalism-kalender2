@@ -56,6 +56,9 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   if (height < 65) {
     activityBlockClasses.push('activity-block-compact');
   }
+  if (height < 45) {
+    activityBlockClasses.push('activity-block-extra-compact');
+  }
 
   return (
     <div
