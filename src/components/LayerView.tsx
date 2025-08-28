@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Activity, FamilyMember, Settings } from '../types';
 import { ActivityBlock } from './ActivityBlock';
 import { calculatePosition } from '../utils/scheduleUtils';
@@ -14,6 +14,7 @@ interface LayerViewProps {
   selectedWeek: number;
   selectedYear: number;
   onActivityClick: (activity: Activity) => void;
+  highlightedMemberId: string | null;
 }
 
 export const LayerView: React.FC<LayerViewProps> = ({
@@ -25,10 +26,27 @@ export const LayerView: React.FC<LayerViewProps> = ({
   settings,
   selectedWeek,
   selectedYear,
-  onActivityClick
+  onActivityClick,
+  highlightedMemberId,
 }) => {
+  const memberRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun',
                      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  
+  useEffect(() => {
+    if (highlightedMemberId && memberRefs.current[highlightedMemberId]) {
+      const element = memberRefs.current[highlightedMemberId];
+      element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      
+      element?.classList.add('highlighted');
+      setTimeout(() => {
+        element?.classList.remove('highlighted');
+      }, 1200);
+    }
+  }, [highlightedMemberId]);
 
   const getActivitiesForMemberAndDay = (memberId: string, day: string) => {
     return activities
@@ -75,7 +93,8 @@ export const LayerView: React.FC<LayerViewProps> = ({
           
           return (
             <div 
-              key={member.id} 
+              key={member.id}
+              ref={(el) => { memberRefs.current[member.id] = el; }}
               className={`participant-layer ${!hasActivities ? 'inactive' : ''}`}
               style={{ borderLeftColor: member.color }}
             >
@@ -118,7 +137,6 @@ export const LayerView: React.FC<LayerViewProps> = ({
                             settings.dayStart
                           );
 
-                          // Check if this activity has multiple participants
                           const isShared = activity.participants.length > 1;
                           
                           const activityBlockProps = {

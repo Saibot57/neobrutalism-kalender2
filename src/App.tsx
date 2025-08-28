@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { AlertCircle, Layers, Grid3x3 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Types
 import type { Activity, FormData, Settings } from './types';
@@ -82,6 +82,7 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dataModalOpen, setDataModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>(BLANK_FORM);
+  const [highlightedMemberId, setHighlightedMemberId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -132,6 +133,13 @@ export default function App() {
   const goToCurrentWeek = () => {
     setSelectedWeek(currentWeek);
     setSelectedYear(currentYear);
+  };
+
+  const handleMemberClick = (memberId: string) => {
+    setViewMode('layer');
+    setHighlightedMemberId(memberId);
+    // Rensa efter en kort stund så att effekten kan köras igen
+    setTimeout(() => setHighlightedMemberId(null), 100);
   };
 
   const handleSaveActivity = () => {
@@ -388,29 +396,12 @@ export default function App() {
           }}
           onOpenSettings={() => setSettingsOpen(true)}
         />
-        <FamilyBar members={DEFAULT_FAMILY_MEMBERS} />
-        
-        {/* View Mode Toggle */}
-        <div className="view-mode-toggle">
-          <button
-            className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
-            onClick={() => setViewMode('grid')}
-            aria-label="Rutnätsvy"
-            title="Visa veckoschema i rutnät"
-          >
-            <Grid3x3 size={20} />
-            Rutnätsvy
-          </button>
-          <button
-            className={`view-mode-btn ${viewMode === 'layer' ? 'active' : ''}`}
-            onClick={() => setViewMode('layer')}
-            aria-label="Lagervy"
-            title="Visa schema uppdelat per familjemedlem"
-          >
-            <Layers size={20} />
-            Lagervy
-          </button>
-        </div>
+        <FamilyBar
+          members={DEFAULT_FAMILY_MEMBERS}
+          viewMode={viewMode}
+          onSetViewMode={setViewMode}
+          onMemberClick={handleMemberClick}
+        />
 
         <WeekNavigation
           isCurrentWeek={isCurrentWeek}
@@ -446,7 +437,6 @@ export default function App() {
           </div>
         )}
         
-        {/* Conditional rendering based on view mode */}
         {viewMode === 'grid' ? (
           <ScheduleGrid
             days={days}
@@ -470,6 +460,7 @@ export default function App() {
             selectedWeek={selectedWeek}
             selectedYear={selectedYear}
             onActivityClick={handleActivityClick}
+            highlightedMemberId={highlightedMemberId}
           />
         )}
 
