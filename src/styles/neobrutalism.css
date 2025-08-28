@@ -767,163 +767,6 @@ h1 {
     margin-top: 20px;
   }
 }
-/* Replace the previous .hover-card styles with these */
-
-.activity-block-wrapper {
-  position: relative;
-}
-
-.hover-card {
-  position: absolute;
-  bottom: calc(100% + 10px); /* Position above the element with a 10px gap */
-  right: 10px; /* Align to the right, slightly inset */
-  width: 280px;
-  background: var(--neo-white);
-  border: 3px solid var(--neo-black);
-  box-shadow: var(--shadow-lg);
-  z-index: 20;
-  padding: 15px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-  pointer-events: none;
-}
-
-.activity-block-wrapper:hover .hover-card {
-  opacity: 1;
-  visibility: visible;
-}
-
-.hover-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  border-bottom: 2px solid var(--neo-black);
-  padding-bottom: 10px;
-}
-
-.hover-card-icon {
-  font-size: 1.8rem;
-}
-
-.hover-card-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.hover-card-body p {
-  margin-bottom: 8px;
-}
-
-.hover-card-participants {
-  margin-top: 10px;
-}
-
-.participants-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.participant-badge {
-  background: var(--neo-bg);
-  padding: 4px 8px;
-  border: 2px solid var(--neo-black);
-  font-weight: 500;
-  font-size: 0.8rem;
-}
-
-.hover-card-notes {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-/* Add these styles to the end of the file */
-
-.activity-block-wrapper {
-  position: relative;
-}
-
-.hover-card {
-  position: absolute;
-  bottom: calc(100% + 10px);
-  right: 10px;
-  width: 280px;
-  background: var(--neo-white);
-  border: 3px solid var(--neo-black);
-  box-shadow: var(--shadow-lg);
-  z-index: 20;
-  padding: 15px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-  pointer-events: none;
-}
-
-/* New rule for Monday activities */
-.activity-block-wrapper.hover-on-right .hover-card {
-  left: calc(100% + 10px);
-  right: auto;
-  top: 0;
-  bottom: auto;
-  transform: translateY(0);
-}
-
-.activity-block-wrapper:hover .hover-card {
-  opacity: 1;
-  visibility: visible;
-}
-
-.hover-card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-  border-bottom: 2px solid var(--neo-black);
-  padding-bottom: 10px;
-}
-
-.hover-card-icon {
-  font-size: 1.8rem;
-}
-
-.hover-card-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-.hover-card-body p {
-  margin-bottom: 8px;
-}
-
-.hover-card-participants {
-  margin-top: 10px;
-}
-
-.participants-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.participant-badge {
-  background: var(--neo-bg);
-  padding: 4px 8px;
-  border: 2px solid var(--neo-black);
-  font-weight: 500;
-  font-size: 0.8rem;
-}
-
-.hover-card-notes {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
 /* Data Modal Tabs */
 .data-modal-tabs {
   display: flex;
@@ -1455,4 +1298,49 @@ h1 {
   background: linear-gradient(180deg, 
     transparent 0%, 
     rgba(255, 223, 61, 0.03) 100%);
+}
+/* --- Hover Card Dynamic Positioning --- */
+.hover-card {
+  position: absolute;
+  width: 280px;
+  background: var(--neo-white);
+  border: 3px solid var(--neo-black);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  padding: 15px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.hover-card.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Vertical Positioning */
+.hover-card.position-top {
+  bottom: calc(100% + 10px);
+}
+.hover-card.position-bottom {
+  top: calc(100% + 10px);
+}
+
+/* Horizontal Positioning */
+.hover-card.position-left {
+  right: 0px;
+}
+.hover-card.position-right {
+  left: 0px;
+}
+.hover-card.position-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Correction for centered transforms */
+.hover-card.position-top.position-center,
+.hover-card.position-bottom.position-center {
+    transform: translate(-50%, 0);
 }

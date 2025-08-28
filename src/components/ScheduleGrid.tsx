@@ -148,7 +148,9 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                         left,
                         width,
                       },
-                      onClick: () => onActivityClick(activity)
+                      onClick: () => onActivityClick(activity),
+                      dayIndex: index,
+                      totalDays: days.length,
                     };
                     
                     // Spread the props into the component

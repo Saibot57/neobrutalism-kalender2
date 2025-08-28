@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import type { Activity, FamilyMember } from '../types';
 import { HoverCard } from './HoverCard';
 
@@ -8,6 +8,8 @@ interface ActivityBlockProps {
   style: React.CSSProperties;
   onClick: () => void;
   day: string;
+  dayIndex: number;
+  totalDays: number;
 }
 
 export const ActivityBlock: React.FC<ActivityBlockProps> = ({
@@ -15,11 +17,40 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   familyMembers,
   style,
   onClick,
-  day
+  day,
+  dayIndex,
+  totalDays
 }) => {
   const participants = activity.participants
     .map(id => familyMembers.find(m => m.id === id))
     .filter(Boolean) as FamilyMember[];
+
+  const [isCardVisible, setCardVisible] = useState(false);
+  const [positionClasses, setPositionClasses] = useState('');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = () => {
+    if (!wrapperRef.current) return;
+
+    const rect = wrapperRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    
+    const verticalClass = rect.top > viewportHeight / 2 ? 'position-top' : 'position-bottom';
+    
+    let horizontalClass = 'position-center';
+    if (dayIndex === 0) {
+      horizontalClass = 'position-right';
+    } else if (dayIndex === totalDays - 1) {
+      horizontalClass = 'position-left';
+    }
+    
+    setPositionClasses(`${verticalClass} ${horizontalClass}`);
+    setCardVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setCardVisible(false);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -49,7 +80,6 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   };
 
   const backgroundStyle = getBackgroundStyle();
-  const wrapperClassName = `activity-block-wrapper ${day === 'Måndag' ? 'hover-on-right' : ''}`;
   
   const height = typeof style.height === 'number' ? style.height : 0;
   const activityBlockClasses = ['activity-block'];
@@ -62,8 +92,11 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
 
   return (
     <div
-      className={wrapperClassName}
+      className="activity-block-wrapper"
       style={style}
+      ref={wrapperRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div
         className={activityBlockClasses.join(' ')}
@@ -92,7 +125,12 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
           ))}
         </div>
       </div>
-      <HoverCard activity={activity} familyMembers={familyMembers} />
+      <HoverCard 
+        activity={activity} 
+        familyMembers={familyMembers} 
+        positionClasses={positionClasses}
+        isVisible={isCardVisible}
+      />
     </div>
   );
 };

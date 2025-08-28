@@ -4,15 +4,19 @@ import type { Activity, FamilyMember } from '../types';
 interface HoverCardProps {
   activity: Activity;
   familyMembers: FamilyMember[];
+  positionClasses: string;
+  isVisible: boolean;
 }
 
-export const HoverCard: React.FC<HoverCardProps> = ({ activity, familyMembers }) => {
+export const HoverCard: React.FC<HoverCardProps> = ({ activity, familyMembers, positionClasses, isVisible }) => {
   const participants = activity.participants
     .map(id => familyMembers.find(m => m.id === id))
     .filter(Boolean) as FamilyMember[];
 
+  const visibilityClass = isVisible ? 'visible' : '';
+
   return (
-    <div className="hover-card">
+    <div className={`hover-card ${positionClasses} ${visibilityClass}`}>
       <div className="hover-card-header">
         <span className="hover-card-icon">{activity.icon}</span>
         <h3 className="hover-card-title">{activity.name}</h3>

@@ -133,7 +133,9 @@ export const LayerView: React.FC<LayerViewProps> = ({
                               width: 'calc(100% - 8px)',
                               opacity: isShared ? 0.95 : 1,
                             },
-                            onClick: () => onActivityClick(activity)
+                            onClick: () => onActivityClick(activity),
+                            dayIndex: dayIndex,
+                            totalDays: days.length,
                           };
                           
                           return (
