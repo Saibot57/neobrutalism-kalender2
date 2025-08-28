@@ -33,17 +33,40 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
       .sort((a, b) => a.startTime.localeCompare(b.startTime));
   };
 
+  // Add overlap intensity levels
+  const getOverlapIntensity = (overlapGroups: Activity[][]) => {
+    if (overlapGroups.length <= 1) return 'none';
+    if (overlapGroups.length === 2) return 'low';
+    if (overlapGroups.length <= 3) return 'medium';
+    return 'high';
+  };
+
   const monthAbbr = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun',
                      'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
 
+  // Dynamically adjust column width based on overlap intensity
   const columnWidths = days.map(day => {
     const dayActivities = getActivitiesForDay(day);
     const overlapGroups = calculateOverlapGroups(dayActivities);
-    // Om det finns 2 eller fler grupper (dvs. en krock), gör kolumnen 50% bredare.
-    return overlapGroups.length > 1 ? '1.5fr' : '1fr';
+    const intensity = getOverlapIntensity(overlapGroups);
+    
+    switch(intensity) {
+      case 'high': return '2fr';
+      case 'medium': return '1.75fr';
+      case 'low': return '1.5fr';
+      default: return '1fr';
+    }
   });
 
   const gridTemplateColumns = `80px ${columnWidths.join(' ')}`;
+
+  // Helper function to get visual indicator for busy days
+  const getDayIntensityClass = (day: string) => {
+    const dayActivities = getActivitiesForDay(day);
+    const overlapGroups = calculateOverlapGroups(dayActivities);
+    const intensity = getOverlapIntensity(overlapGroups);
+    return `day-intensity-${intensity}`;
+  };
 
   return (
     <main className="schedule-container" role="main" aria-label="Veckans schema">
@@ -65,14 +88,22 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
           const dayActivities = getActivitiesForDay(day);
           const overlapGroups = calculateOverlapGroups(dayActivities);
           const numColumns = overlapGroups.length;
+          const intensity = getOverlapIntensity(overlapGroups);
 
           return (
-            <div key={day} className="day-column">
+            <div key={day} className={`day-column ${getDayIntensityClass(day)}`}>
               <div className={`day-header ${isToday(date) ? 'today' : ''}`}>
                 <span className="day-name">{day}</span>
                 <span className="day-date">
                   {date.getDate()} {monthAbbr[date.getMonth()]}
                 </span>
+                {/* Add visual indicator for busy days */}
+                {intensity !== 'none' && (
+                  <span className={`intensity-indicator intensity-${intensity}`} 
+                        title={`${overlapGroups.length} overlapping activities`}>
+                    {intensity === 'high' ? '🔥' : intensity === 'medium' ? '⚡' : '📌'}
+                  </span>
+                )}
               </div>
               <div className="day-content" style={{ height: `${timeSlots.length * 60}px` }}>
                 {overlapGroups.map((group, groupIndex) =>
@@ -83,8 +114,27 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                       60,
                       settings.dayStart
                     );
-                    const width = numColumns > 1 ? `${100 / numColumns}%` : 'calc(100% - 8px)';
-                    const left = numColumns > 1 ? `${(100 / numColumns) * groupIndex}%` : '4px';
+                    
+                    // Adjust width calculation based on intensity
+                    let width: string;
+                    let left: string;
+                    
+                    if (numColumns > 1) {
+                      // For overlapping activities, calculate proportional width
+                      const baseWidth = 100 / numColumns;
+                      width = `${baseWidth}%`;
+                      left = `${baseWidth * groupIndex}%`;
+                      
+                      // Apply slight padding for better visual separation in high-density scenarios
+                      if (intensity === 'high') {
+                        width = `calc(${baseWidth}% - 2px)`;
+                      } else if (intensity === 'medium') {
+                        width = `calc(${baseWidth}% - 1px)`;
+                      }
+                    } else {
+                      width = 'calc(100% - 8px)';
+                      left = '4px';
+                    }
 
                     // Define props in an object before passing them
                     const activityBlockProps = {

@@ -954,3 +954,122 @@ h1 {
 .tab-btn.active {
   background: var(--neo-yellow);
 }
+/* Overlap Intensity Indicators - Add to end of neobrutalism.css */
+
+/* Intensity indicator badge in day header */
+.intensity-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 1.2rem;
+  z-index: 2;
+  animation: pulse 2s infinite;
+}
+
+.intensity-indicator.intensity-low {
+  animation: none;
+}
+
+.intensity-indicator.intensity-medium {
+  animation: pulse 3s infinite;
+}
+
+.intensity-indicator.intensity-high {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Day column visual indicators for different intensities */
+.day-column.day-intensity-low .day-header {
+  border-top: 3px solid var(--neo-yellow);
+}
+
+.day-column.day-intensity-medium .day-header {
+  border-top: 3px solid var(--neo-orange);
+}
+
+.day-column.day-intensity-high .day-header {
+  border-top: 3px solid var(--neo-red);
+  position: relative;
+}
+
+.day-column.day-intensity-high .day-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    var(--neo-red) 0%, 
+    transparent 50%, 
+    var(--neo-red) 100%);
+  animation: warning-pulse 2s infinite;
+}
+
+@keyframes warning-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Activity blocks in high-intensity columns get special treatment */
+.day-column.day-intensity-high .activity-block {
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.day-column.day-intensity-high .activity-block:hover {
+  z-index: 100 !important;
+  transform: scale(1.05) translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--neo-black);
+}
+
+.day-column.day-intensity-medium .activity-block {
+  font-size: 0.85rem;
+}
+
+/* Subtle background tint for busy columns */
+.day-column.day-intensity-low .day-content {
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 223, 61, 0.05) 100%);
+}
+
+.day-column.day-intensity-medium .day-content {
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 159, 69, 0.08) 100%);
+}
+
+.day-column.day-intensity-high .day-content {
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 107, 107, 0.1) 100%);
+}
+
+/* Improved activity separation in high-density scenarios */
+.day-column.day-intensity-high .activity-block-wrapper + .activity-block-wrapper {
+  margin-left: 1px;
+}
+
+.day-column.day-intensity-medium .activity-block-wrapper + .activity-block-wrapper {
+  margin-left: 0.5px;
+}
+
+/* Responsive adjustments for intensity indicators */
+@media (max-width: 768px) {
+  .intensity-indicator {
+    font-size: 1rem;
+    top: 3px;
+    right: 3px;
+  }
+  
+  .day-column.day-intensity-high .activity-block,
+  .day-column.day-intensity-medium .activity-block {
+    font-size: 0.75rem;
+  }
+}
