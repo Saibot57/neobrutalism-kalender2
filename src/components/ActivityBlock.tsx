@@ -7,7 +7,7 @@ interface ActivityBlockProps {
   familyMembers: FamilyMember[];
   style: React.CSSProperties;
   onClick: () => void;
-  day: string;
+  // day: string; <-- DENNA RAD TAS BORT
   dayIndex: number;
   totalDays: number;
 }
@@ -17,7 +17,7 @@ export const ActivityBlock: React.FC<ActivityBlockProps> = ({
   familyMembers,
   style,
   onClick,
-  day,
+  // day, <-- DENNA VARIABEL TAS BORT
   dayIndex,
   totalDays
 }) => {
