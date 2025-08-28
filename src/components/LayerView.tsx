@@ -49,9 +49,6 @@ export const LayerView: React.FC<LayerViewProps> = ({
     ).length;
   };
 
-  // Calculate grid template columns - same width for all days in layer view
-  const gridTemplateColumns = `120px ${days.map(() => '1fr').join(' ')}`;
-
   return (
     <main className="layer-view-container" role="main" aria-label="Schema per familjemedlem">
       <div className="layer-view-header">
