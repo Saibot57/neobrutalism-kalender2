@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Layers, Grid3x3 } from 'lucide-react';
 
 // Types
 import type { Activity, FormData, Settings } from './types';
@@ -36,6 +36,7 @@ import { FamilyBar } from './components/FamilyBar';
 import { WeekNavigation } from './components/WeekNavigation';
 import { WeekPicker } from './components/WeekPicker';
 import { ScheduleGrid } from './components/ScheduleGrid';
+import { LayerView } from './components/LayerView';
 import { ActivityModal } from './components/ActivityModal';
 import { SettingsModal } from './components/SettingsModal';
 import { DataModal } from './components/DataModal';
@@ -57,12 +58,15 @@ const BLANK_FORM: FormData = {
   color: undefined
 };
 
+type ViewMode = 'grid' | 'layer';
+
 export default function App() {
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsModalRef = useRef<HTMLDivElement>(null);
 
   const [activities, setActivities] = useLocalStorage<Activity[]>('familjens-schema-activities', []);
   const [settings, setSettings] = useLocalStorage<Settings>('familjens-schema-settings', DEFAULT_SETTINGS);
+  const [viewMode, setViewMode] = useLocalStorage<ViewMode>('familjens-schema-view-mode', 'grid');
 
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -288,7 +292,7 @@ export default function App() {
 
       importedData.forEach(item => {
         if (item.startDate && item.recurringEndDate && item.day) {
-          const seriesId = generateActivityId(); // UPPDATERAD: Skapa ett ID för hela serien
+          const seriesId = generateActivityId();
           const startDate = new Date(item.startDate);
           const endDate = new Date(item.recurringEndDate);
           const dayOfWeek = ALL_DAYS.indexOf(item.day);
@@ -301,7 +305,7 @@ export default function App() {
           while (cursor <= endDate) {
             newActivities.push({
               id: generateActivityId(),
-              seriesId: seriesId, // UPPDATERAD: Sätt serie-ID för varje händelse
+              seriesId: seriesId,
               name: item.name || 'Unnamed Event',
               icon: item.icon || '📅',
               day: item.day,
@@ -385,6 +389,29 @@ export default function App() {
           onOpenSettings={() => setSettingsOpen(true)}
         />
         <FamilyBar members={DEFAULT_FAMILY_MEMBERS} />
+        
+        {/* View Mode Toggle */}
+        <div className="view-mode-toggle">
+          <button
+            className={`view-mode-btn ${viewMode === 'grid' ? 'active' : ''}`}
+            onClick={() => setViewMode('grid')}
+            aria-label="Rutnätsvy"
+            title="Visa veckoschema i rutnät"
+          >
+            <Grid3x3 size={20} />
+            Rutnätsvy
+          </button>
+          <button
+            className={`view-mode-btn ${viewMode === 'layer' ? 'active' : ''}`}
+            onClick={() => setViewMode('layer')}
+            aria-label="Lagervy"
+            title="Visa schema uppdelat per familjemedlem"
+          >
+            <Layers size={20} />
+            Lagervy
+          </button>
+        </div>
+
         <WeekNavigation
           isCurrentWeek={isCurrentWeek}
           clipboardWeek={clipboardWeek}
@@ -418,17 +445,34 @@ export default function App() {
             <AlertCircle size={24}/> Tidskonflikt! En deltagare är redan upptagen.
           </div>
         )}
-        <ScheduleGrid
-          days={days}
-          weekDates={weekDates}
-          timeSlots={timeSlots}
-          activities={activities}
-          familyMembers={DEFAULT_FAMILY_MEMBERS}
-          settings={settings}
-          selectedWeek={selectedWeek}
-          selectedYear={selectedYear}
-          onActivityClick={handleActivityClick}
-        />
+        
+        {/* Conditional rendering based on view mode */}
+        {viewMode === 'grid' ? (
+          <ScheduleGrid
+            days={days}
+            weekDates={weekDates}
+            timeSlots={timeSlots}
+            activities={activities}
+            familyMembers={DEFAULT_FAMILY_MEMBERS}
+            settings={settings}
+            selectedWeek={selectedWeek}
+            selectedYear={selectedYear}
+            onActivityClick={handleActivityClick}
+          />
+        ) : (
+          <LayerView
+            days={days}
+            weekDates={weekDates}
+            timeSlots={timeSlots}
+            activities={activities}
+            familyMembers={DEFAULT_FAMILY_MEMBERS}
+            settings={settings}
+            selectedWeek={selectedWeek}
+            selectedYear={selectedYear}
+            onActivityClick={handleActivityClick}
+          />
+        )}
+
         <ActivityModal
           ref={modalRef}
           isOpen={modalOpen}

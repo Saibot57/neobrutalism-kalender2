@@ -1072,4 +1072,387 @@ h1 {
   .day-column.day-intensity-medium .activity-block {
     font-size: 0.75rem;
   }
+}/* Layer View Styles - Add to end of neobrutalism.css */
+
+/* View Mode Toggle */
+.view-mode-toggle {
+  background: var(--neo-white);
+  border: 3px solid var(--neo-black);
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-mode-btn {
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+  padding: 10px 20px;
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .1s;
+  box-shadow: var(--shadow-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.view-mode-btn:hover {
+  background: var(--neo-yellow);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+
+.view-mode-btn.active {
+  background: var(--neo-purple);
+  color: var(--neo-white);
+  box-shadow: var(--shadow-md);
+}
+
+/* Layer View Container */
+.layer-view-container {
+  background: var(--neo-white);
+  border: 3px solid var(--neo-black);
+  box-shadow: var(--shadow-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Layer View Header */
+.layer-view-header {
+  display: grid;
+  grid-template-columns: 120px repeat(auto-fit, minmax(150px, 1fr));
+  background: var(--neo-cyan);
+  border-bottom: 3px solid var(--neo-black);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.layer-time-header {
+  background: var(--neo-purple);
+  color: var(--neo-white);
+  border-right: 3px solid var(--neo-black);
+}
+
+.corner-cell {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 10px;
+}
+
+.layer-day-header {
+  height: 80px;
+  border-right: 2px solid var(--neo-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  position: relative;
+}
+
+.layer-day-header.today {
+  background: var(--neo-pink);
+  color: var(--neo-white);
+}
+
+.layer-day-header .day-name {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+.layer-day-header .day-date {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Layer View Body */
+.layer-view-body {
+  overflow: auto;
+  max-height: calc(100vh - 400px);
+}
+
+/* Participant Layers */
+.participant-layer {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  border-bottom: 2px solid var(--neo-black);
+  min-height: 120px;
+  position: relative;
+  border-left: 5px solid;
+  transition: background 0.2s ease;
+}
+
+.participant-layer:hover {
+  background: var(--neo-bg);
+}
+
+.participant-layer.inactive {
+  opacity: 0.6;
+}
+
+.participant-layer:last-child {
+  border-bottom: none;
+}
+
+/* Member Info Column */
+.member-info {
+  border-right: 3px solid var(--neo-black);
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: var(--neo-white);
+}
+
+.member-avatar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.member-icon {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: var(--neo-white);
+  border: 2px solid var(--neo-black);
+  box-shadow: var(--shadow-sm);
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.activity-count {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* Mini Timeline */
+.member-timeline {
+  display: none; /* Hidden by default, shown on hover */
+  flex-direction: column;
+  font-size: 0.6rem;
+  opacity: 0.5;
+  margin-top: 10px;
+}
+
+.participant-layer:hover .member-timeline {
+  display: flex;
+}
+
+.mini-time-slot {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  border-top: 1px dotted var(--neo-black);
+}
+
+/* Member Schedule Grid */
+.member-schedule {
+  display: grid;
+  position: relative;
+}
+
+.member-day-column {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  position: relative;
+  background: var(--neo-white);
+  min-height: inherit;
+}
+
+.member-day-column.today {
+  background: linear-gradient(180deg, 
+    rgba(255, 107, 107, 0.05) 0%, 
+    rgba(255, 107, 107, 0.02) 100%);
+}
+
+.member-day-column:last-child {
+  border-right: none;
+}
+
+.day-activities {
+  position: relative;
+}
+
+/* Layer Activity Wrapper */
+.layer-activity-wrapper {
+  position: relative;
+}
+
+.shared-indicator {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 0.8rem;
+  background: var(--neo-yellow);
+  border: 2px solid var(--neo-black);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Time Grid Overlay */
+.time-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.time-line {
+  position: absolute;
+  left: 120px;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.time-line:nth-child(2n) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.time-label {
+  position: absolute;
+  left: -115px;
+  background: var(--neo-white);
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--neo-black);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Special styling for activities in layer view */
+.layer-view-container .activity-block {
+  border-width: 2px;
+  box-shadow: var(--shadow-sm);
+}
+
+.layer-view-container .activity-block:hover {
+  transform: scale(1.02) translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+  z-index: 15 !important;
+}
+
+/* Responsive adjustments for Layer View */
+@media (max-width: 1200px) {
+  .layer-view-header {
+    grid-template-columns: 100px repeat(auto-fit, minmax(120px, 1fr));
+  }
+  
+  .participant-layer {
+    grid-template-columns: 100px 1fr;
+  }
+  
+  .member-info {
+    padding: 10px;
+  }
+  
+  .member-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .view-mode-toggle {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .view-mode-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .layer-view-container {
+    overflow-x: auto;
+  }
+  
+  .layer-view-header,
+  .participant-layer {
+    min-width: 600px;
+  }
+  
+  .member-timeline {
+    display: none !important;
+  }
+  
+  .member-name {
+    font-size: 0.85rem;
+  }
+  
+  .activity-count {
+    font-size: 0.65rem;
+  }
+  
+  .time-grid-overlay {
+    display: none;
+  }
+}
+
+/* Animation for switching between views */
+.layer-view-container,
+.schedule-container {
+  animation: fadeInView 0.3s ease-in-out;
+}
+
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Highlight active participant on hover */
+.participant-layer:hover .member-info {
+  background: linear-gradient(90deg, 
+    var(--neo-yellow) 0%, 
+    transparent 100%);
+}
+
+.participant-layer:hover .member-day-column {
+  background: linear-gradient(180deg, 
+    transparent 0%, 
+    rgba(255, 223, 61, 0.03) 100%);
 }
