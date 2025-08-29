@@ -408,8 +408,9 @@ h1 {
   display: flex;
   align-items: center;
   gap: 6px;
-  white-space: normal;
+  white-space: normal; /* CHANGED: Allow text to wrap */
   overflow: hidden;
+  /* text-overflow: ellipsis; <-- REMOVED */
 }
 
 .activity-time {
@@ -433,19 +434,16 @@ h1 {
   gap: 2px;
 }
 
-.activity-block.activity-block-compact .activity-participants {
+.activity-block.activity-block-compact .activity-participants,
+.activity-block.activity-block-compact .activity-name span { /* Hide participants and icon */
   display: none;
 }
 
 .activity-block.activity-block-compact .activity-name {
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
-  gap: 2px;
-  text-align: center;
 }
 
 .activity-block.activity-block-extra-compact {
