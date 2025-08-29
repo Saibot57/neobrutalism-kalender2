@@ -80,7 +80,6 @@ export default function App() {
   const [editingActivity, setEditingActivity] = useState<Activity | null>(null);
   const [showWeekPicker, setShowWeekPicker] = useState(false);
   const [showConflict, setShowConflict] = useState(false);
-  const [clipboardWeek, setClipboardWeek] = useState<{ week: number; year: number } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dataModalOpen, setDataModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>(BLANK_FORM);
@@ -261,31 +260,6 @@ export default function App() {
     setModalOpen(true);
   };
 
-  const handleCopyWeek = () => {
-    setClipboardWeek({ week: selectedWeek, year: selectedYear });
-  };
-
-  const handlePasteWeek = () => {
-    if (!clipboardWeek) return;
-    const copiedActivities = activities
-      .filter(a => a.week === clipboardWeek.week && a.year === clipboardWeek.year)
-      .map(a => ({
-        ...a,
-        id: generateActivityId(),
-        week: selectedWeek,
-        year: selectedYear
-      }));
-
-    if (conflictsExist(copiedActivities, activities)) {
-      setShowConflict(true);
-      setTimeout(() => setShowConflict(false), 3000);
-      return;
-    }
-    setShowConflict(false);
-    setActivities(prev => [...prev, ...copiedActivities]);
-    setClipboardWeek(null);
-  };
-
   const handleExportAllJSON = () => {
     const dataToExport = activities.map(a => {
       const weekDatesForActivity = getWeekDateRange(a.week, a.year, 7);
@@ -440,14 +414,9 @@ export default function App() {
 
         <WeekNavigation
           isCurrentWeek={isCurrentWeek}
-          clipboardWeek={clipboardWeek}
-          selectedWeek={selectedWeek}
-          selectedYear={selectedYear}
           onNavigateWeek={navigateWeek}
           onGoToCurrentWeek={goToCurrentWeek}
           onToggleWeekPicker={() => setShowWeekPicker(!showWeekPicker)}
-          onCopyWeek={handleCopyWeek}
-          onPasteWeek={handlePasteWeek}
           onOpenDataModal={() => setDataModalOpen(true)}
         />
         {showWeekPicker && (
