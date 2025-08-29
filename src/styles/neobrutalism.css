@@ -1,3 +1,4 @@
+/* src/styles/neobrutalism.css */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
 
 * {
@@ -407,9 +408,9 @@ h1 {
   display: flex;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
+  white-space: normal; /* CHANGED: Allow text to wrap */
   overflow: hidden;
-  text-overflow: ellipsis;
+  /* text-overflow: ellipsis; <-- REMOVED */
 }
 
 .activity-time {
