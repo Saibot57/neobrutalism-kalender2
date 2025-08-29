@@ -1,3 +1,5 @@
+// src/components/ScheduleGrid.tsx
+
 import React from 'react';
 import type { Activity, FamilyMember, Settings } from '../types';
 import { ActivityBlock } from './ActivityBlock';
@@ -115,25 +117,18 @@ export const ScheduleGrid: React.FC<ScheduleGridProps> = ({
                       settings.dayStart
                     );
                     
-                    // Adjust width calculation based on intensity
                     let width: string;
                     let left: string;
-                    
+
                     if (numColumns > 1) {
-                      // For overlapping activities, calculate proportional width
-                      const baseWidth = 100 / numColumns;
-                      width = `${baseWidth}%`;
-                      left = `${baseWidth * groupIndex}%`;
-                      
-                      // Apply slight padding for better visual separation in high-density scenarios
-                      if (intensity === 'high') {
-                        width = `calc(${baseWidth}% - 2px)`;
-                      } else if (intensity === 'medium') {
-                        width = `calc(${baseWidth}% - 1px)`;
-                      }
+                        const baseWidth = 100 / numColumns;
+                        // 2px margin on each side of the block, creating a 4px gap between blocks
+                        width = `calc(${baseWidth}% - 4px)`;
+                        left = `calc(${baseWidth * groupIndex}% + 2px)`;
                     } else {
-                      width = 'calc(100% - 8px)';
-                      left = '4px';
+                        // 4px margin on each side for single blocks
+                        width = 'calc(100% - 8px)';
+                        left = '4px';
                     }
 
                     // Define props in an object before passing them

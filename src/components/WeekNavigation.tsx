@@ -1,5 +1,7 @@
+// src/components/WeekNavigation.tsx
+
 import React from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Copy, Upload, Download, Home } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Copy, Upload, Home, ArrowRightLeft } from 'lucide-react';
 
 interface WeekNavigationProps {
   isCurrentWeek: boolean;
@@ -11,7 +13,6 @@ interface WeekNavigationProps {
   onToggleWeekPicker: () => void;
   onCopyWeek: () => void;
   onPasteWeek: () => void;
-  onExportWeek: () => void;
   onOpenDataModal: () => void;
 }
 
@@ -25,7 +26,6 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
   onToggleWeekPicker,
   onCopyWeek,
   onPasteWeek,
-  onExportWeek,
   onOpenDataModal
 }) => {
   const canPaste = clipboardWeek &&
@@ -87,14 +87,7 @@ export const WeekNavigation: React.FC<WeekNavigationProps> = ({
             className="btn btn-warning"
             onClick={onOpenDataModal}
            >
-            <Upload size={20} /> Importera
-          </button>
-          <button
-            className="btn btn-success"
-            onClick={onExportWeek}
-            aria-label="Exportera vecka som ICS"
-          >
-            <Download size={20}/> Exportera
+            <ArrowRightLeft size={20} /> Import / Export
           </button>
         </div>
       </div>

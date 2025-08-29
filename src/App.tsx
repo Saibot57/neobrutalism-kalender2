@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import { useState, useEffect, useRef } from 'react';
 import { AlertCircle } from 'lucide-react';
 
@@ -25,7 +27,7 @@ import {
   conflictsExist,
   generateActivityId
 } from './utils/scheduleUtils';
-import { downloadICS } from './utils/exportUtils';
+import { downloadAllICS } from './utils/exportUtils';
 
 // Hooks
 import { useLocalStorage, useFocusTrap } from './hooks';
@@ -284,8 +286,41 @@ export default function App() {
     setClipboardWeek(null);
   };
 
-  const handleExportWeek = () => {
-    downloadICS(activities, selectedWeek, selectedYear, weekDates, days);
+  const handleExportAllJSON = () => {
+    const dataToExport = activities.map(a => {
+      const weekDatesForActivity = getWeekDateRange(a.week, a.year, 7);
+      const dayIndex = ALL_DAYS.indexOf(a.day);
+      const activityDate = weekDatesForActivity[dayIndex];
+  
+      return {
+        name: a.name,
+        icon: a.icon,
+        date: activityDate.toISOString().split('T')[0], // Format YYYY-MM-DD
+        participants: a.participants,
+        startTime: a.startTime,
+        endTime: a.endTime,
+        location: a.location || undefined,
+        notes: a.notes || undefined,
+        color: a.color || undefined
+      };
+    });
+  
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'familjens-schema-export.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setDataModalOpen(false);
+  };
+  
+  const handleExportAllICS = () => {
+    downloadAllICS(activities);
+    setDataModalOpen(false);
   };
 
   const processJsonText = (text: string) => {
@@ -413,7 +448,6 @@ export default function App() {
           onToggleWeekPicker={() => setShowWeekPicker(!showWeekPicker)}
           onCopyWeek={handleCopyWeek}
           onPasteWeek={handlePasteWeek}
-          onExportWeek={handleExportWeek}
           onOpenDataModal={() => setDataModalOpen(true)}
         />
         {showWeekPicker && (
@@ -488,6 +522,8 @@ export default function App() {
           onClose={() => setDataModalOpen(false)}
           onFileImport={handleFileImport}
           onTextImport={handleTextImport}
+          onExportJSON={handleExportAllJSON}
+          onExportICS={handleExportAllICS}
         />
       </div>
     </div>
