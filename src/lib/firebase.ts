@@ -5,12 +5,11 @@ import {
   collection, 
   doc,
   getDocs,
-  getDoc, 
+  getDoc,
   setDoc,
-  addDoc,
-  updateDoc, 
+  updateDoc,
   deleteDoc,
-  query, 
+  query,
   where,
   orderBy,
   writeBatch
@@ -41,7 +40,8 @@ export const activityService = {
         orderBy('week', 'desc')
       );
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return querySnapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data()
       } as Activity));
@@ -59,7 +59,8 @@ export const activityService = {
         where('year', '==', year)
       );
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return querySnapshot.docs.map((doc: any) => ({
         id: doc.id,
         ...doc.data()
       } as Activity));
@@ -118,9 +119,10 @@ export const activityService = {
         where('seriesId', '==', seriesId)
       );
       const querySnapshot = await getDocs(q);
-      
+
       const batch = writeBatch(db);
-      querySnapshot.docs.forEach((doc) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      querySnapshot.docs.forEach((doc: any) => {
         batch.delete(doc.ref);
       });
       

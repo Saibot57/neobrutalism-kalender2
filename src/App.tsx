@@ -9,7 +9,6 @@ import type { Activity, FormData, Settings } from './types';
 // Constants
 import {
   DEFAULT_FAMILY_MEMBERS,
-  DEFAULT_SETTINGS,
   WEEKDAYS_FULL,
   WEEKEND_DAYS,
   ALL_DAYS
@@ -68,10 +67,9 @@ export default function App() {
   const settingsModalRef = useRef<HTMLDivElement>(null);
 
   // UPDATED: Using Firebase hooks with localStorage fallback
-  const { 
-    activities, 
-    setActivities,
-    loading: activitiesLoading, 
+  const {
+    activities,
+    loading: activitiesLoading,
     error: activitiesError,
     saveActivities: saveActivitiesToDb,
     updateActivity: updateActivityInDb,
@@ -79,12 +77,11 @@ export default function App() {
     deleteActivitySeries: deleteSeriesFromDb
   } = useFirebaseActivities(true); // true = use localStorage as fallback
 
-  const { 
-    settings, 
-    setSettings,
-    loading: settingsLoading, 
+  const {
+    settings,
+    loading: settingsLoading,
     error: settingsError,
-    saveSettings: saveSettingsToDb 
+    saveSettings: saveSettingsToDb
   } = useFirebaseSettings();
 
   // ViewMode still uses localStorage directly (it's just UI preference)
@@ -185,7 +182,7 @@ export default function App() {
       return;
     }
 
-    let newActivities: Activity[] = [];
+    const newActivities: Activity[] = [];
 
     if (editingActivity) {
       const updatedActivity = {
@@ -378,7 +375,7 @@ export default function App() {
           const endDate = new Date(item.recurringEndDate);
           const dayOfWeek = ALL_DAYS.indexOf(item.day);
           if (dayOfWeek === -1) return;
-          let cursor = new Date(startDate);
+          const cursor = new Date(startDate);
           while ((cursor.getDay() + 6) % 7 !== dayOfWeek) {
             cursor.setDate(cursor.getDate() + 1);
           }
@@ -434,11 +431,12 @@ export default function App() {
       
       alert(`${newActivities.length} activities imported successfully!`);
       setDataModalOpen(false); 
-    } catch (error: any) {
+      } catch (error) {
         console.error("Error importing activities:", error);
         setSyncStatus('error');
-        alert(`Failed to import activities. Please check the data format.\n\nError: ${error.message}`);
-    }
+        const message = error instanceof Error ? error.message : String(error);
+        alert(`Failed to import activities. Please check the data format.\n\nError: ${message}`);
+      }
   };
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
