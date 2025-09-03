@@ -1,4 +1,4 @@
-// src/App.tsx - Uppdaterad med Firebase integration
+// src/App.tsx
 
 import { useState, useEffect, useRef } from 'react';
 import { AlertCircle } from 'lucide-react';
@@ -9,6 +9,7 @@ import type { Activity, FormData, Settings } from './types';
 // Constants
 import {
   DEFAULT_FAMILY_MEMBERS,
+  DEFAULT_SETTINGS,
   WEEKDAYS_FULL,
   WEEKEND_DAYS,
   ALL_DAYS
@@ -28,9 +29,8 @@ import {
 } from './utils/scheduleUtils';
 import { downloadAllICS } from './utils/exportUtils';
 
-// Hooks - UPDATED: Using Firebase hooks instead of localStorage
-import { useFocusTrap, useLocalStorage } from './hooks';
-import { useFirebaseActivities, useFirebaseSettings } from './hooks/useFirebase';
+// Hooks
+import { useLocalStorage, useFocusTrap } from './hooks';
 
 // Components
 import { Header } from './components/Header';
@@ -66,25 +66,8 @@ export default function App() {
   const modalRef = useRef<HTMLDivElement>(null);
   const settingsModalRef = useRef<HTMLDivElement>(null);
 
-  // UPDATED: Using Firebase hooks with localStorage fallback
-  const {
-    activities,
-    loading: activitiesLoading,
-    error: activitiesError,
-    saveActivities: saveActivitiesToDb,
-    updateActivity: updateActivityInDb,
-    deleteActivity: deleteActivityFromDb,
-    deleteActivitySeries: deleteSeriesFromDb
-  } = useFirebaseActivities(true); // true = use localStorage as fallback
-
-  const {
-    settings,
-    loading: settingsLoading,
-    error: settingsError,
-    saveSettings: saveSettingsToDb
-  } = useFirebaseSettings();
-
-  // ViewMode still uses localStorage directly (it's just UI preference)
+  const [activities, setActivities] = useLocalStorage<Activity[]>('familjens-schema-activities', []);
+  const [settings, setSettings] = useLocalStorage<Settings>('familjens-schema-settings', DEFAULT_SETTINGS);
   const [viewMode, setViewMode] = useLocalStorage<ViewMode>('familjens-schema-view-mode', 'grid');
 
   const [selectedWeek, setSelectedWeek] = useState(getWeekNumber(new Date()));
@@ -101,7 +84,6 @@ export default function App() {
   const [dataModalOpen, setDataModalOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>(BLANK_FORM);
   const [highlightedMemberId, setHighlightedMemberId] = useState<string | null>(null);
-  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'error'>('idle');
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -133,18 +115,6 @@ export default function App() {
     return () => document.removeEventListener('keydown', handleEsc);
   }, [modalOpen, settingsOpen, showWeekPicker, dataModalOpen]);
 
-  // Show sync status
-  useEffect(() => {
-    if (activitiesError || settingsError) {
-      setSyncStatus('error');
-      console.warn('Using local storage - Firebase sync failed');
-    } else if (activitiesLoading || settingsLoading) {
-      setSyncStatus('syncing');
-    } else {
-      setSyncStatus('idle');
-    }
-  }, [activitiesLoading, settingsLoading, activitiesError, settingsError]);
-
   useFocusTrap(modalRef, modalOpen);
   useFocusTrap(settingsModalRef, settingsOpen);
 
@@ -169,10 +139,11 @@ export default function App() {
   const handleMemberClick = (memberId: string) => {
     setViewMode('layer');
     setHighlightedMemberId(memberId);
+    // Rensa efter en kort stund så att effekten kan köras igen
     setTimeout(() => setHighlightedMemberId(null), 100);
   };
 
-  const handleSaveActivity = async () => {
+  const handleSaveActivity = () => {
     if (!formData.name || formData.days.length === 0 || formData.participants.length === 0) {
       alert('Fyll i alla obligatoriska fält!');
       return;
@@ -182,33 +153,17 @@ export default function App() {
       return;
     }
 
-    const newActivities: Activity[] = [];
+    let newActivities: Activity[] = [];
 
     if (editingActivity) {
-      const updatedActivity = {
+      newActivities = [{
         ...editingActivity,
         ...formData,
         day: formData.days[0],
         week: selectedWeek,
         year: selectedYear,
         color: formData.color
-      };
-      
-      if (conflictsExist([updatedActivity], activities.filter(a => a.id !== editingActivity.id))) {
-        setShowConflict(true);
-        setTimeout(() => setShowConflict(false), 3000);
-        return;
-      }
-
-      try {
-        setSyncStatus('syncing');
-        await updateActivityInDb(updatedActivity);
-        setSyncStatus('idle');
-      } catch (error) {
-        console.error('Failed to update activity:', error);
-        setSyncStatus('error');
-        // The hook will handle localStorage fallback
-      }
+      }];
     } else {
       if (formData.recurring && formData.recurringEndDate) {
         const seriesId = generateActivityId(); 
@@ -261,50 +216,39 @@ export default function App() {
           });
         });
       }
+    }
 
-      if (conflictsExist(newActivities, activities)) {
-        setShowConflict(true);
-        setTimeout(() => setShowConflict(false), 3000);
-        return;
-      }
-
-      try {
-        setSyncStatus('syncing');
-        await saveActivitiesToDb(newActivities);
-        setSyncStatus('idle');
-      } catch (error) {
-        console.error('Failed to save activities:', error);
-        setSyncStatus('error');
-        // The hook will handle localStorage fallback
-      }
+    if (conflictsExist(newActivities, activities)) {
+      setShowConflict(true);
+      setTimeout(() => setShowConflict(false), 3000);
+      return;
     }
 
     setShowConflict(false);
+
+    if (editingActivity) {
+      setActivities(prev => prev.map(a =>
+        a.id === editingActivity.id ? newActivities[0] : a
+      ));
+    } else {
+      setActivities(prev => [...prev, ...newActivities]);
+    }
+
     setModalOpen(false);
     setEditingActivity(null);
   };
 
-  const handleDeleteActivity = async () => {
+  const handleDeleteActivity = () => {
     if (!editingActivity) return;
   
-    try {
-      setSyncStatus('syncing');
-      
-      if (editingActivity.seriesId) {
-        if (window.confirm("Vill du ta bort alla kommande händelser i den här serien? \n\nTryck på 'OK' för att ta bort hela serien, eller 'Avbryt' för att bara ta bort denna enskilda händelse.")) {
-          await deleteSeriesFromDb(editingActivity.seriesId);
-        } else {
-          await deleteActivityFromDb(editingActivity.id);
-        }
+    if (editingActivity.seriesId) {
+      if (window.confirm("Vill du ta bort alla kommande händelser i den här serien? \n\nTryck på 'OK' för att ta bort hela serien, eller 'Avbryt' för att bara ta bort denna enskilda händelse.")) {
+        setActivities(prev => prev.filter(a => a.seriesId !== editingActivity.seriesId));
       } else {
-        await deleteActivityFromDb(editingActivity.id);
+        setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
       }
-      
-      setSyncStatus('idle');
-    } catch (error) {
-      console.error('Failed to delete activity:', error);
-      setSyncStatus('error');
-      // The hook will handle localStorage fallback
+    } else {
+      setActivities(prev => prev.filter(a => a.id !== editingActivity.id));
     }
   
     setModalOpen(false);
@@ -325,7 +269,7 @@ export default function App() {
       return {
         name: a.name,
         icon: a.icon,
-        date: activityDate.toISOString().split('T')[0],
+        date: activityDate.toISOString().split('T')[0], // Format YYYY-MM-DD
         participants: a.participants,
         startTime: a.startTime,
         endTime: a.endTime,
@@ -353,14 +297,9 @@ export default function App() {
     setDataModalOpen(false);
   };
 
-  const processJsonText = async (text: string) => {
+  const processJsonText = (text: string) => {
     try {
-      const importedData = JSON.parse(text) as Array<Partial<Activity> & { 
-        date?: string; 
-        startDate?: string; 
-        recurringEndDate?: string; 
-        day?: string 
-      }>;
+      const importedData = JSON.parse(text) as Array<Partial<Activity> & { date?: string; startDate?: string; recurringEndDate?: string; day?: string }>;
 
       if (!Array.isArray(importedData)) {
         throw new Error("Invalid JSON format: must be an array.");
@@ -375,7 +314,7 @@ export default function App() {
           const endDate = new Date(item.recurringEndDate);
           const dayOfWeek = ALL_DAYS.indexOf(item.day);
           if (dayOfWeek === -1) return;
-          const cursor = new Date(startDate);
+          let cursor = new Date(startDate);
           while ((cursor.getDay() + 6) % 7 !== dayOfWeek) {
             cursor.setDate(cursor.getDate() + 1);
           }
@@ -425,18 +364,13 @@ export default function App() {
         return;
       }
 
-      setSyncStatus('syncing');
-      await saveActivitiesToDb(newActivities);
-      setSyncStatus('idle');
-      
+      setActivities(prev => [...prev, ...newActivities]);
       alert(`${newActivities.length} activities imported successfully!`);
       setDataModalOpen(false); 
-      } catch (error) {
+    } catch (error: any) {
         console.error("Error importing activities:", error);
-        setSyncStatus('error');
-        const message = error instanceof Error ? error.message : String(error);
-        alert(`Failed to import activities. Please check the data format.\n\nError: ${message}`);
-      }
+        alert(`Failed to import activities. Please check the data format.\n\nError: ${error.message}`);
+    }
   };
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -458,41 +392,9 @@ export default function App() {
     processJsonText(jsonText);
   };
 
-  const handleSettingsChange = async (newSettings: Settings) => {
-    try {
-      setSyncStatus('syncing');
-      await saveSettingsToDb(newSettings);
-      setSyncStatus('idle');
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      setSyncStatus('error');
-      // The hook will handle localStorage fallback
-    }
-  };
-
-  // Loading state
-  if (activitiesLoading || settingsLoading) {
-    return (
-      <div className="app-container">
-        <div className="content-wrapper" style={{ textAlign: 'center', padding: '50px' }}>
-          <h2>Laddar schema...</h2>
-          <p style={{ marginTop: '20px' }}>Synkroniserar med molnet 🔄</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container">
       <div className="content-wrapper">
-        {/* Sync status indicator */}
-        {syncStatus === 'error' && (
-          <div className="notice-banner" style={{ background: 'var(--neo-orange)', marginBottom: '20px' }}>
-            <AlertCircle size={24}/>
-            Offline-läge: Ändringar sparas lokalt och synkas när anslutning återställs
-          </div>
-        )}
-        
         <Header
           selectedWeek={selectedWeek}
           selectedYear={selectedYear}
@@ -582,7 +484,7 @@ export default function App() {
           isOpen={settingsOpen}
           settings={settings}
           onClose={() => setSettingsOpen(false)}
-          onSettingsChange={handleSettingsChange}
+          onSettingsChange={setSettings}
         />
         <DataModal
           isOpen={dataModalOpen}
